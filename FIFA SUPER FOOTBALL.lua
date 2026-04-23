@@ -12,42 +12,39 @@ local Camera = workspace.CurrentCamera
 local settings = {
     magnet = false,
     speed = false,
-    sVal = 35, -- Hız arttırıldı
+    sVal = 35,
     infStamina = false,
     esp = false,
     infJump = false,
     powerShot = false,
-    pVal = 150, -- Şut gücü
+    pVal = 150,
     toggleKey = Enum.KeyCode.RightControl
 }
 
--- --- ROWNN MASTER UI ---
+-- --- ROWNN MASTER UI (Gelişmiş Menü) ---
 local sg = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-sg.Name = "RowNN_SuperFootball"; sg.ResetOnSpawn = false
+sg.Name = "RowNN_Fixed_V3"; sg.ResetOnSpawn = false
 
 local frame = Instance.new("Frame", sg)
-frame.Size = UDim2.new(0, 400, 0, 300) -- Menü büyütüldü
+frame.Size = UDim2.new(0, 400, 0, 300)
 frame.Position = UDim2.new(0.5, -200, 0.4, -150)
 frame.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
 frame.BorderSizePixel = 0
 frame.Active = true; frame.Draggable = true
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
 
--- Yan Menü (Sayfalar)
+-- Yan Menü
 local sidebar = Instance.new("Frame", frame)
 sidebar.Size = UDim2.new(0, 100, 1, 0); sidebar.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
 Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0, 10)
 
--- Başlık
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(0, 300, 0, 40); title.Position = UDim2.new(0, 100, 0, 0)
 title.Text = "FIFA BY ROWNN0"; title.TextColor3 = Color3.fromRGB(0, 255, 127)
 title.BackgroundTransparency = 1; title.Font = "GothamBold"; title.TextSize = 16
 
--- Sayfa Konteynırı
 local container = Instance.new("Frame", frame)
-container.Size = UDim2.new(1, -110, 1, -50); container.Position = UDim2.new(0, 105, 0, 45)
-container.BackgroundTransparency = 1
+container.Size = UDim2.new(1, -110, 1, -50); container.Position = UDim2.new(0, 105, 0, 45); container.BackgroundTransparency = 1
 
 local pages = {}
 local function createPage(name)
@@ -58,33 +55,25 @@ local function createPage(name)
     return p
 end
 
-local mainPage = createPage("Main")
-local espPage = createPage("Visuals")
-local otherPage = createPage("Others")
+local mainPage = createPage("Main"); local espPage = createPage("Visuals"); local otherPage = createPage("Others")
 mainPage.Visible = true
 
--- Sayfa Değiştirme Fonksiyonu
 local function showPage(name)
     for _, p in pairs(pages) do p.Visible = false end
     pages[name].Visible = true
 end
 
--- Sidebar Butonları
 local function addTab(name, yPos)
     local b = Instance.new("TextButton", sidebar)
-    b.Size = UDim2.new(1, 0, 0, 40); b.Position = UDim2.new(0, 0, 0, yPos)
-    b.Text = name; b.BackgroundColor3 = Color3.fromRGB(25, 25, 30); b.TextColor3 = Color3.new(1,1,1)
-    b.Font = "GothamMedium"; b.BorderSizePixel = 0
+    b.Size = UDim2.new(1, 0, 0, 40); b.Position = UDim2.new(0, 0, 0, yPos); b.Text = name; b.BackgroundColor3 = Color3.fromRGB(25, 25, 30); b.TextColor3 = Color3.new(1,1,1); b.Font = "GothamMedium"; b.BorderSizePixel = 0
     b.MouseButton1Click:Connect(function() showPage(name) end)
 end
 
 addTab("Main", 50); addTab("Visuals", 100); addTab("Others", 150)
 
--- --- ÖZELLİK EKLEME ---
 local function addToggle(name, parent, callback)
     local b = Instance.new("TextButton", parent)
-    b.Size = UDim2.new(0.95, 0, 0, 35); b.BackgroundColor3 = Color3.fromRGB(30, 30, 35); b.Text = name.." [OFF]"
-    b.TextColor3 = Color3.new(1,1,1); b.Font = "Gotham"; b.TextSize = 12
+    b.Size = UDim2.new(0.95, 0, 0, 35); b.BackgroundColor3 = Color3.fromRGB(30, 30, 35); b.Text = name.." [OFF]"; b.TextColor3 = Color3.new(1,1,1); b.Font = "Gotham"; b.TextSize = 12
     Instance.new("UICorner", b).CornerRadius = UDim.new(0, 5)
     local state = false
     b.MouseButton1Click:Connect(function()
@@ -95,27 +84,53 @@ local function addToggle(name, parent, callback)
     end)
 end
 
--- MAIN PAGE
 addToggle("Ball Magnet", mainPage, function(v) settings.magnet = v end)
 addToggle("Speed Bypass", mainPage, function(v) settings.speed = v end)
 addToggle("Infinite Stamina", mainPage, function(v) settings.infStamina = v end)
 addToggle("Power Shot", mainPage, function(v) settings.powerShot = v end)
-
--- VISUALS PAGE
 addToggle("Player ESP", espPage, function(v) settings.esp = v end)
-
--- OTHERS PAGE
 addToggle("Inf Jump", otherPage, function(v) settings.infJump = v end)
-local info = Instance.new("TextLabel", otherPage)
-info.Size = UDim2.new(0.9, 0, 0, 60); info.BackgroundTransparency = 1; info.TextColor3 = Color3.new(0.8, 0.8, 0.8)
-info.Text = "Menu Key: Right Control\nYoutube: youtube.com/@RoWnn0\nNo Key - Free Script"; info.Font = "GothamItalic"; info.TextSize = 11
 
--- --- MEKANİKLER ---
+-- --- FİXED MEKANİKLER ---
+
+-- Infinite Stamina Fix (Sürekli Güncelleme)
+task.spawn(function()
+    while task.wait(0.1) do
+        if settings.infStamina then
+            pcall(function()
+                local char = LocalPlayer.Character
+                -- Stamina objesini karakterin içinde veya "Data" klasöründe arar
+                local staminaObj = char:FindFirstChild("Stamina") or LocalPlayer:FindFirstChild("Stamina") or char:FindFirstChild("StaminaValues")
+                if staminaObj then
+                    if staminaObj:IsA("NumberValue") or staminaObj:IsA("IntValue") then
+                        staminaObj.Value = 100
+                    end
+                end
+                -- Alternatif: Bazı oyunlar stamina'yı bir script içinde saklar, hızı yüksek tutarak dolaylı bypass yaparız
+                if char:FindFirstChild("Humanoid") then
+                    char.Humanoid.JumpPower = 50 
+                end
+            end)
+        end
+    end
+end)
+
+-- Infinite Jump Fix (Fiziksel İtme)
+UserInputService.JumpRequest:Connect(function()
+    if settings.infJump then
+        local char = LocalPlayer.Character
+        if char and char:FindFirstChild("HumanoidRootPart") then
+            -- Karakterin dikey hızını doğrudan değiştirir (Zıplama engelini aşar)
+            char.HumanoidRootPart.Velocity = Vector3.new(char.HumanoidRootPart.Velocity.X, 60, char.HumanoidRootPart.Velocity.Z)
+        end
+    end
+end)
+
 RunService.Heartbeat:Connect(function()
     local char = LocalPlayer.Character
-    if not char then return end
+    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
 
-    -- Magnet
+    -- Magnet & Speed
     if settings.magnet then
         local ball = workspace:FindFirstChild("Football") or workspace:FindFirstChild("Ball")
         if ball and (ball.Position - char.HumanoidRootPart.Position).Magnitude < 20 then
@@ -124,27 +139,8 @@ RunService.Heartbeat:Connect(function()
         end
     end
 
-    -- Power Shot (Şuta basıldığında topu ileri fırlatır)
-    if settings.powerShot then
-        local ball = workspace:FindFirstChild("Football") or workspace:FindFirstChild("Ball")
-        if ball and (ball.Position - char.HumanoidRootPart.Position).Magnitude < 8 then
-            ball.Velocity = Camera.CFrame.LookVector * settings.pVal
-        end
-    end
-
-    -- Speed & Stamina
     if char:FindFirstChild("Humanoid") then
         char.Humanoid.WalkSpeed = settings.speed and settings.sVal or 16
-    end
-    if settings.infStamina and char:FindFirstChild("Stamina") then
-        char.Stamina.Value = 100
-    end
-end)
-
--- Inf Jump
-UserInputService.JumpRequest:Connect(function()
-    if settings.infJump and LocalPlayer.Character then
-        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(3)
     end
 end)
 
@@ -160,7 +156,9 @@ task.spawn(function()
     end
 end)
 
--- Menü Aç/Kapat
+-- Menü Tuşu
 UserInputService.InputBegan:Connect(function(i, p)
     if not p and i.KeyCode == settings.toggleKey then frame.Visible = not frame.Visible end
 end)
+
+print("RowNN V3.1 Fixed - Youtube: youtube.com/@RoWnn0")
