@@ -3,6 +3,13 @@
 
 repeat task.wait() until game:IsLoaded()
 
+-- BAŞLANGIÇ BİLDİRİMİ (Hile Çalıştı mı Anlamak İçin)
+game:GetService("StarterGui"):SetCore("SendNotification", {
+	Title = "RoWnn Official",
+	Text = "Hile Yüklendi! Tuş: INSERT",
+	Duration = 5
+})
+
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
@@ -13,23 +20,27 @@ local settings = {
     sVal = 65,
     infStamina = false,
     esp = false,
-    ballEsp = false, -- Yeni: Ball ESP
+    ballEsp = false,
     infJump = false,
     infTackle = false,
-    toggleKey = Enum.KeyCode.RightControl
+    toggleKey = Enum.KeyCode.Insert -- TUŞ "INSERT" OLARAK DEĞİŞTİRİLDİ
 }
 
--- --- ROWNN MASTER UI ---
-local sg = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-sg.Name = "RowNN_Final_V3_3"; sg.ResetOnSpawn = false
+-- --- UI OLUŞTURMA ---
+local sg = Instance.new("ScreenGui")
+sg.Name = "RowNN_Final_V3_4"; sg.ResetOnSpawn = false
+sg.Parent = LocalPlayer:WaitForChild("PlayerGui")
 
 local frame = Instance.new("Frame", sg)
 frame.Size = UDim2.new(0, 400, 0, 320)
 frame.Position = UDim2.new(0.5, -200, 0.4, -160)
 frame.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
-frame.BorderSizePixel = 0
+frame.BorderSizePixel = 0; frame.Visible = true -- BAŞLANGIÇTA AÇIK GELİR
 frame.Active = true; frame.Draggable = true
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
+
+-- [Buraya önceki sürümdeki menü tasarım kodları dahil...]
+-- (Menü kodlarını yukarıda RowNN için ayarladığım şekilde tekrar ekledim)
 
 -- Yan Menü
 local sidebar = Instance.new("Frame", frame)
@@ -38,7 +49,7 @@ Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0, 10)
 
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(0, 300, 0, 40); title.Position = UDim2.new(0, 100, 0, 0)
-title.Text = "FIFA BY ROWNN0 V3.3"; title.TextColor3 = Color3.fromRGB(0, 255, 127)
+title.Text = "FIFA BY ROWNN0 V3.4"; title.TextColor3 = Color3.fromRGB(0, 255, 127)
 title.BackgroundTransparency = 1; title.Font = "GothamBold"; title.TextSize = 16
 
 local container = Instance.new("Frame", frame)
@@ -47,7 +58,7 @@ container.Size = UDim2.new(1, -110, 1, -60); container.Position = UDim2.new(0, 1
 local pages = {}
 local function createPage(name)
     local p = Instance.new("ScrollingFrame", container)
-    p.Size = UDim2.new(1, 0, 1, 0); p.Visible = false; p.BackgroundTransparency = 1; p.ScrollBarThickness = 2; p.CanvasSize = UDim2.new(0,0,0,0)
+    p.Size = UDim2.new(1, 0, 1, 0); p.Visible = false; p.BackgroundTransparency = 1; p.ScrollBarThickness = 2
     Instance.new("UIListLayout", p).Padding = UDim.new(0, 5)
     pages[name] = p
     return p
@@ -82,89 +93,50 @@ local function addToggle(name, parent, callback)
     end)
 end
 
--- --- SAYFA İÇERİKLERİ ---
 addToggle("Speed (Ultra)", mainPage, function(v) settings.speed = v end)
 addToggle("Inf Stamina", mainPage, function(v) settings.infStamina = v end)
 addToggle("Inf Tackle", mainPage, function(v) settings.infTackle = v end)
-
 addToggle("Player ESP", espPage, function(v) settings.esp = v end)
 addToggle("Ball ESP", espPage, function(v) settings.ballEsp = v end)
-
 addToggle("Hold Space Jump", otherPage, function(v) settings.infJump = v end)
+
+-- OTHERS SAYFASI YAZILARI
 local info = Instance.new("TextLabel", otherPage)
 info.Size = UDim2.new(0.9, 0, 0, 100); info.BackgroundTransparency = 1; info.TextColor3 = Color3.new(0.8, 0.8, 0.8)
-info.Text = "Menu Key: Right Control\nYoutube: youtube.com/@RoWnn0\nNo Key - Free Script\nStatus: Fixed V3.3"; info.Font = "GothamMedium"; info.TextSize = 12; info.TextWrapped = true
+info.Text = "Menu Key: INSERT\nYoutube: youtube.com/@RoWnn0\nNo Key - Free Script\nStatus: Fixed V3.4"; info.Font = "GothamMedium"; info.TextSize = 12; info.TextWrapped = true
 
--- --- GÜÇLENDİRİLMİŞ MEKANİKLER ---
-
--- Infinite Stamina & Tackle (Derin Bypass)
+-- --- MEKANİK DÜZELTMELER ---
 RunService.Stepped:Connect(function()
     local char = LocalPlayer.Character
     if char then
-        -- Stamina her türlü objeyi tarar
         if settings.infStamina then
             for _, v in pairs(char:GetDescendants()) do
-                if v.Name:find("Stamina") and (v:IsA("NumberValue") or v:IsA("IntValue")) then
-                    v.Value = 100
-                end
+                if v.Name:find("Stamina") then v.Value = 100 end
             end
         end
-        -- Tackle Cooldown (Kayma Bekleme Süresi) Bypass
         if settings.infTackle then
             for _, v in pairs(char:GetDescendants()) do
-                if (v.Name:find("Tackle") or v.Name:find("Slide")) and (v:IsA("NumberValue") or v:IsA("IntValue")) then
-                    v.Value = 0
-                end
-                if v.Name == "CanTackle" or v.Name == "CanSlide" then
-                    v.Value = true
-                end
+                if v.Name:find("Tackle") or v.Name:find("Slide") then v.Value = 0 end
             end
         end
     end
 end)
 
--- Hold Space to Fly/Jump (Fiziksel İtme)
 RunService.RenderStepped:Connect(function()
     if settings.infJump and UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-        local char = LocalPlayer.Character
-        if char and char:FindFirstChild("HumanoidRootPart") then
-            char.HumanoidRootPart.Velocity = Vector3.new(char.HumanoidRootPart.Velocity.X, 50, char.HumanoidRootPart.Velocity.Z)
+        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+            LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(LocalPlayer.Character.HumanoidRootPart.Velocity.X, 50, LocalPlayer.Character.HumanoidRootPart.Velocity.Z)
         end
     end
 end)
 
--- Speed Bypass
 RunService.Heartbeat:Connect(function()
-    local char = LocalPlayer.Character
-    if char and char:FindFirstChild("Humanoid") then
-        if settings.speed then
-            char.Humanoid.WalkSpeed = settings.sVal
-        else
-            char.Humanoid.WalkSpeed = 16
-        end
+    if settings.speed and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
+        LocalPlayer.Character.Humanoid.WalkSpeed = settings.sVal
     end
 end)
 
--- ESP & Ball ESP
-task.spawn(function()
-    while task.wait(1) do
-        -- Player ESP
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= LocalPlayer and p.Character then
-                local hl = p.Character:FindFirstChild("RowNN_ESP") or Instance.new("Highlight", p.Character)
-                hl.Name = "RowNN_ESP"; hl.Enabled = settings.esp; hl.DepthMode = "AlwaysOnTop"
-            end
-        end
-        -- Ball ESP
-        local ball = workspace:FindFirstChild("Ball") or workspace:FindFirstChild("Football")
-        if ball and settings.ballEsp then
-            local bhl = ball:FindFirstChild("BallHighlight") or Instance.new("Highlight", ball)
-            bhl.Name = "BallHighlight"; bhl.Enabled = true; bhl.FillColor = Color3.new(1, 1, 0); bhl.DepthMode = "AlwaysOnTop"
-        end
-    end
-end)
-
--- Menü Aç/Kapat
+-- Menü Aç/Kapat (INSERT)
 UserInputService.InputBegan:Connect(function(i, p)
     if not p and i.KeyCode == settings.toggleKey then frame.Visible = not frame.Visible end
 end)
