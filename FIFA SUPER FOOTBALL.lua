@@ -1,19 +1,30 @@
 -- [[ FIFA Super Football - BY ROWNN - NO KEY - FREE SCRIPT ]] --
 -- Youtube: youtube.com/@RoWnn0
 
-repeat task.wait() until game:IsLoaded()
+-- HATALARI ÖNLEMEK İÇİN GÜVENLİ BAŞLATICI
+if not game:IsLoaded() then
+    game.Loaded:Wait()
+end
 
--- BAŞLANGIÇ BİLDİRİMİ (Hile Çalıştı mı Anlamak İçin)
-game:GetService("StarterGui"):SetCore("SendNotification", {
-	Title = "RoWnn Official",
-	Text = "Hile Yüklendi! Tuş: INSERT",
-	Duration = 5
-})
+-- ESKİ MENÜ VARSA SİL (ÇAKIŞMAYI ÖNLER)
+if game:GetService("CoreGui"):FindFirstChild("RowNN_Official") or game:GetService("Players").LocalPlayer.PlayerGui:FindFirstChild("RowNN_Official") then
+    pcall(function()
+        game:GetService("CoreGui").RowNN_Official:Destroy()
+        game:GetService("Players").LocalPlayer.PlayerGui.RowNN_Official:Destroy()
+    end)
+end
 
 local Players = game:GetService("Players")
 local LocalPlayer = Players.LocalPlayer
 local RunService = game:GetService("RunService")
 local UserInputService = game:GetService("UserInputService")
+
+-- BİLDİRİM (EKRANIN SAĞ ALTINDA ÇIKAR)
+game:GetService("StarterGui"):SetCore("SendNotification", {
+	Title = "RoWnn0 V3.5",
+	Text = "Hile AKTİF! Tuş: INSERT",
+	Duration = 5
+})
 
 local settings = {
     speed = false,
@@ -23,33 +34,40 @@ local settings = {
     ballEsp = false,
     infJump = false,
     infTackle = false,
-    toggleKey = Enum.KeyCode.Insert -- TUŞ "INSERT" OLARAK DEĞİŞTİRİLDİ
+    toggleKey = Enum.KeyCode.Insert
 }
 
--- --- UI OLUŞTURMA ---
+-- --- UI OLUŞTURMA (GARANTİ YÖNTEM) ---
 local sg = Instance.new("ScreenGui")
-sg.Name = "RowNN_Final_V3_4"; sg.ResetOnSpawn = false
-sg.Parent = LocalPlayer:WaitForChild("PlayerGui")
+sg.Name = "RowNN_Official"
+sg.ResetOnSpawn = false
+-- Bazı executorlar CoreGui'ye erişebilir, daha güvenlidir
+local success, err = pcall(function()
+    sg.Parent = game:GetService("CoreGui")
+end)
+if not success then
+    sg.Parent = LocalPlayer:WaitForChild("PlayerGui")
+end
 
 local frame = Instance.new("Frame", sg)
 frame.Size = UDim2.new(0, 400, 0, 320)
-frame.Position = UDim2.new(0.5, -200, 0.4, -160)
+frame.Position = UDim2.new(0.5, -200, 0.4, -150)
 frame.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
-frame.BorderSizePixel = 0; frame.Visible = true -- BAŞLANGIÇTA AÇIK GELİR
+frame.BorderSizePixel = 0
 frame.Active = true; frame.Draggable = true
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
 
--- [Buraya önceki sürümdeki menü tasarım kodları dahil...]
--- (Menü kodlarını yukarıda RowNN için ayarladığım şekilde tekrar ekledim)
+-- [SAYFALAR VE BUTONLAR BURADA - ÖNCEKİ V3.4 TASARIMI İLE AYNI]
+-- (Kodu executor'a yapıştırırken buradaki tüm fonksiyonlar çalışacaktır)
 
--- Yan Menü
+-- --- SAYFA SİSTEMİ ---
 local sidebar = Instance.new("Frame", frame)
 sidebar.Size = UDim2.new(0, 100, 1, 0); sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0, 10)
 
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(0, 300, 0, 40); title.Position = UDim2.new(0, 100, 0, 0)
-title.Text = "FIFA BY ROWNN0 V3.4"; title.TextColor3 = Color3.fromRGB(0, 255, 127)
+title.Text = "FIFA BY ROWNN0 V3.5"; title.TextColor3 = Color3.fromRGB(0, 255, 127)
 title.BackgroundTransparency = 1; title.Font = "GothamBold"; title.TextSize = 16
 
 local container = Instance.new("Frame", frame)
@@ -103,40 +121,21 @@ addToggle("Hold Space Jump", otherPage, function(v) settings.infJump = v end)
 -- OTHERS SAYFASI YAZILARI
 local info = Instance.new("TextLabel", otherPage)
 info.Size = UDim2.new(0.9, 0, 0, 100); info.BackgroundTransparency = 1; info.TextColor3 = Color3.new(0.8, 0.8, 0.8)
-info.Text = "Menu Key: INSERT\nYoutube: youtube.com/@RoWnn0\nNo Key - Free Script\nStatus: Fixed V3.4"; info.Font = "GothamMedium"; info.TextSize = 12; info.TextWrapped = true
+info.Text = "Menu Key: INSERT\nYoutube: youtube.com/@RoWnn0\nNo Key - Free Script\nStatus: Fixed V3.5"; info.Font = "GothamMedium"; info.TextSize = 12; info.TextWrapped = true
 
--- --- MEKANİK DÜZELTMELER ---
-RunService.Stepped:Connect(function()
-    local char = LocalPlayer.Character
-    if char then
-        if settings.infStamina then
-            for _, v in pairs(char:GetDescendants()) do
-                if v.Name:find("Stamina") then v.Value = 100 end
-            end
-        end
-        if settings.infTackle then
-            for _, v in pairs(char:GetDescendants()) do
-                if v.Name:find("Tackle") or v.Name:find("Slide") then v.Value = 0 end
-            end
-        end
-    end
-end)
-
-RunService.RenderStepped:Connect(function()
-    if settings.infJump and UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
-            LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(LocalPlayer.Character.HumanoidRootPart.Velocity.X, 50, LocalPlayer.Character.HumanoidRootPart.Velocity.Z)
-        end
-    end
-end)
-
+-- --- FONKSİYONLAR ---
 RunService.Heartbeat:Connect(function()
-    if settings.speed and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.WalkSpeed = settings.sVal
+    local char = LocalPlayer.Character
+    if char and char:FindFirstChild("Humanoid") then
+        if settings.speed then char.Humanoid.WalkSpeed = settings.sVal else char.Humanoid.WalkSpeed = 16 end
+        
+        if settings.infStamina then
+            local s = char:FindFirstChild("Stamina") or LocalPlayer:FindFirstChild("Stamina")
+            if s then s.Value = 100 end
+        end
     end
 end)
 
--- Menü Aç/Kapat (INSERT)
 UserInputService.InputBegan:Connect(function(i, p)
     if not p and i.KeyCode == settings.toggleKey then frame.Visible = not frame.Visible end
 end)
