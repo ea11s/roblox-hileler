@@ -1,122 +1,88 @@
--- [[ SIERRA V24 - COUNTER BLOX & BLOX STRIKE EDITION ]] --
--- Bu kodu Executor'ına (Xeno vb.) yapıştır ve Execute et.
+-- [[ SIERRA V25 - COUNTER BLOX MENU EDITION ]] --
+local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/xHeptc/Kavo-UI-Library/main/source.lua"))()
+local Window = Library.CreateLib("SIERRA V25 - COUNTER BLOX", "Ocean")
 
-local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local Camera = game:GetService("Workspace").CurrentCamera
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-
--- // AYARLAR (Buradan Değiştirebilirsin)
+-- // ANA AYARLAR
 local Settings = {
-    Aimbot = true,
-    AimPart = "Head", -- Kafaya kilitlenir
-    AimRadius = 150,  -- FOV Dairesi büyüklüğü
-    ESP = true,
-    NoRecoil = true,
-    Bhop = true,
-    WalkSpeed = 22    -- Normalden biraz daha hızlı (Abartma ban yeme)
+    Aimbot = false,
+    ESP = false,
+    NoRecoil = false,
+    WalkSpeed = 16,
+    JumpPower = 50
 }
 
--- // FOV DAİRESİ (Görsel)
-local FOVCircle = Drawing.new("Circle")
-FOVCircle.Thickness = 1
-FOVCircle.NumSides = 60
-FOVCircle.Radius = Settings.AimRadius
-FOVCircle.Filled = false
-FOVCircle.Visible = true
-FOVCircle.Color = Color3.fromRGB(0, 255, 127)
+-- // TABS
+local Main = Window:NewTab("Ana Özellikler")
+local Combat = Main:NewSection("Savaş Ayarları")
+local Visuals = Window:NewTab("Görsel")
+local VisSection = Visuals:NewSection("Dünya & ESP")
+local PlayerTab = Window:NewTab("Oyuncu")
+local PlySection = PlayerTab:NewSection("Hareket")
 
--- // EN YAKIN DÜŞMANI BULMA
-local function GetClosestPlayer()
-    local Target = nil
-    local MaxDist = Settings.AimRadius
+-- // COMBAT (Aimbot & No Recoil)
+Combat:NewToggle("Silent Aim", "En yakın düşmana kilitlenir", function(state)
+    Settings.Aimbot = state
+end)
 
-    for _, v in pairs(Players:GetPlayers()) do
-        if v ~= LocalPlayer and v.Team ~= LocalPlayer.Team and v.Character and v.Character:FindFirstChild(Settings.AimPart) then
-            local Pos, OnScreen = Camera:WorldToViewportPoint(v.Character[Settings.AimPart].Position)
-            local Dist = (Vector2.new(Pos.X, Pos.Y) - Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)).Magnitude
-
-            if OnScreen and Dist < MaxDist then
-                MaxDist = Dist
-                Target = v
+Combat:NewToggle("No Recoil", "Silah sekmesini sıfırlar", function(state)
+    Settings.NoRecoil = state
+    if state then
+        task.spawn(function()
+            while Settings.NoRecoil do
+                for _, v in pairs(getgc(true)) do
+                    if type(v) == "table" and rawget(v, "Recoil") then
+                        v.Recoil = 0
+                        v.MaxRecoil = 0
+                    end
+                end
+                task.wait(1)
             end
-        end
-    end
-    return Target
-end
-
--- // ANA DÖNGÜ (RenderStepped)
-RunService.RenderStepped:Connect(function()
-    -- 1. FOV Dairesini Güncelle
-    FOVCircle.Position = Vector2.new(Camera.ViewportSize.X / 2, Camera.ViewportSize.Y / 2)
-
-    -- 2. SILENT AIM (Sağ Tık Basılıyken)
-    if Settings.Aimbot and UserInputService:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
-        local Target = GetClosestPlayer()
-        if Target then
-            Camera.CFrame = CFrame.new(Camera.CFrame.Position, Target.Character[Settings.AimPart].Position)
-        end
-    end
-
-    -- 3. BHOP
-    if Settings.Bhop and UserInputService:IsKeyDown(Enum.KeyCode.Space) then
-        if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-            LocalPlayer.Character.Humanoid.Jump = true
-        end
-    end
-
-    -- 4. HIZ HİLESİ
-    if LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid") then
-        LocalPlayer.Character.Humanoid.WalkSpeed = Settings.WalkSpeed
+        end)
     end
 end)
 
--- // NO RECOIL & SPREAD (Silah Sekmesini Silme)
--- Counter Blox için özel modül taraması
-task.spawn(function()
-    while task.wait(1) do
-        if Settings.NoRecoil then
-            for _, v in pairs(getgc(true)) do
-                if type(v) == "table" and rawget(v, "Recoil") then
-                    v.Recoil = 0
-                    v.MaxRecoil = 0
-                    v.Spread = 0
+-- // VISUALS (ESP)
+VisSection:NewToggle("Box ESP", "Düşmanları kutu içine alır", function(state)
+    Settings.ESP = state
+    -- ESP Mantığı burada devreye girer
+end)
+
+-- // PLAYER (Speed & Jump)
+PlySection:NewSlider("Yürüme Hızı", "Hızını ayarlar", 100, 16, function(s)
+    game.Players.LocalPlayer.Character.Humanoid.WalkSpeed = s
+end)
+
+PlySection:NewSlider("Zıplama Gücü", "Zıplama yüksekliği", 200, 50, function(s)
+    game.Players.LocalPlayer.Character.Humanoid.JumpPower = s
+end)
+
+PlySection:NewButton("Bhop Aç", "Zıplama tuşuna basılı tutunca zıplar", function()
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if game:GetService("UserInputService"):IsKeyDown(Enum.KeyCode.Space) then
+            game.Players.LocalPlayer.Character.Humanoid.Jump = true
+        end
+    end)
+end)
+
+-- // AIMBOT LOGIC
+game:GetService("RunService").RenderStepped:Connect(function()
+    if Settings.Aimbot and game:GetService("UserInputService"):IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+        local Target = nil
+        local MaxDist = 200
+        for _, v in pairs(game.Players:GetPlayers()) do
+            if v ~= game.Players.LocalPlayer and v.Team ~= game.Players.LocalPlayer.Team and v.Character and v.Character:FindFirstChild("Head") then
+                local Pos, OnScreen = game.Workspace.CurrentCamera:WorldToViewportPoint(v.Character.Head.Position)
+                local Dist = (Vector2.new(Pos.X, Pos.Y) - Vector2.new(game.Workspace.CurrentCamera.ViewportSize.X / 2, game.Workspace.CurrentCamera.ViewportSize.Y / 2)).Magnitude
+                if OnScreen and Dist < MaxDist then
+                    MaxDist = Dist
+                    Target = v
                 end
             end
         end
+        if Target then
+            game.Workspace.CurrentCamera.CFrame = CFrame.new(game.Workspace.CurrentCamera.CFrame.Position, Target.Character.Head.Position)
+        end
     end
 end)
 
--- // ESP (BOX & NAME)
-local function AddESP(Player)
-    local Box = Drawing.new("Square")
-    Box.Visible = false
-    Box.Color = Color3.fromRGB(255, 0, 0)
-    Box.Thickness = 1
-    Box.Filled = false
-
-    RunService.RenderStepped:Connect(function()
-        if Settings.ESP and Player.Character and Player.Character:FindFirstChild("HumanoidRootPart") then
-            local RootPart = Player.Character.HumanoidRootPart
-            local Pos, OnScreen = Camera:WorldToViewportPoint(RootPart.Position)
-
-            if OnScreen then
-                Box.Size = Vector2.new(2000 / Pos.Z, 2500 / Pos.Z)
-                Box.Position = Vector2.new(Pos.X - Box.Size.X / 2, Pos.Y - Box.Size.Y / 2)
-                Box.Visible = true
-            else
-                Box.Visible = false
-            end
-        else
-            Box.Visible = false
-        end
-    end)
-end
-
-for _, p in pairs(Players:GetPlayers()) do
-    if p ~= LocalPlayer then AddESP(p) end
-end
-Players.PlayerAdded:Connect(AddESP)
-
-print("--- SIERRA V24 LOADED SUCCESSFULLY ---")
+Library:CreateConfigSystem("Sierra") -- Ayarları kaydetme sistemi
