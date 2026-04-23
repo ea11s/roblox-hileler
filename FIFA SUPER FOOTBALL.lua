@@ -12,39 +12,40 @@ local Camera = workspace.CurrentCamera
 local settings = {
     magnet = false,
     speed = false,
-    sVal = 35,
+    sVal = 60, -- Hız ciddi oranda arttırıldı
     infStamina = false,
     esp = false,
     infJump = false,
+    infTackle = false, -- Yeni Özellik
     powerShot = false,
-    pVal = 150,
+    pVal = 180,
     toggleKey = Enum.KeyCode.RightControl
 }
 
--- --- ROWNN MASTER UI (Gelişmiş Menü) ---
+-- --- ROWNN MASTER UI ---
 local sg = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-sg.Name = "RowNN_Fixed_V3"; sg.ResetOnSpawn = false
+sg.Name = "RowNN_V3_2_Final"; sg.ResetOnSpawn = false
 
 local frame = Instance.new("Frame", sg)
-frame.Size = UDim2.new(0, 400, 0, 300)
-frame.Position = UDim2.new(0.5, -200, 0.4, -150)
-frame.BackgroundColor3 = Color3.fromRGB(12, 12, 15)
+frame.Size = UDim2.new(0, 400, 0, 320)
+frame.Position = UDim2.new(0.5, -200, 0.4, -160)
+frame.BackgroundColor3 = Color3.fromRGB(10, 10, 12)
 frame.BorderSizePixel = 0
 frame.Active = true; frame.Draggable = true
 Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
 
 -- Yan Menü
 local sidebar = Instance.new("Frame", frame)
-sidebar.Size = UDim2.new(0, 100, 1, 0); sidebar.BackgroundColor3 = Color3.fromRGB(18, 18, 22)
+sidebar.Size = UDim2.new(0, 100, 1, 0); sidebar.BackgroundColor3 = Color3.fromRGB(15, 15, 20)
 Instance.new("UICorner", sidebar).CornerRadius = UDim.new(0, 10)
 
 local title = Instance.new("TextLabel", frame)
 title.Size = UDim2.new(0, 300, 0, 40); title.Position = UDim2.new(0, 100, 0, 0)
-title.Text = "FIFA BY ROWNN0"; title.TextColor3 = Color3.fromRGB(0, 255, 127)
+title.Text = "FIFA BY ROWNN0 V3.2"; title.TextColor3 = Color3.fromRGB(0, 255, 127)
 title.BackgroundTransparency = 1; title.Font = "GothamBold"; title.TextSize = 16
 
 local container = Instance.new("Frame", frame)
-container.Size = UDim2.new(1, -110, 1, -50); container.Position = UDim2.new(0, 105, 0, 45); container.BackgroundTransparency = 1
+container.Size = UDim2.new(1, -110, 1, -60); container.Position = UDim2.new(0, 105, 0, 45); container.BackgroundTransparency = 1
 
 local pages = {}
 local function createPage(name)
@@ -84,63 +85,69 @@ local function addToggle(name, parent, callback)
     end)
 end
 
+-- ÖZELLİKLER
 addToggle("Ball Magnet", mainPage, function(v) settings.magnet = v end)
-addToggle("Speed Bypass", mainPage, function(v) settings.speed = v end)
-addToggle("Infinite Stamina", mainPage, function(v) settings.infStamina = v end)
+addToggle("Speed (FAST)", mainPage, function(v) settings.speed = v end)
+addToggle("Inf Stamina", mainPage, function(v) settings.infStamina = v end)
+addToggle("Inf Tackle", mainPage, function(v) settings.infTackle = v end)
 addToggle("Power Shot", mainPage, function(v) settings.powerShot = v end)
 addToggle("Player ESP", espPage, function(v) settings.esp = v end)
 addToggle("Inf Jump", otherPage, function(v) settings.infJump = v end)
 
--- --- FİXED MEKANİKLER ---
+-- --- MEKANİKLER ---
 
--- Infinite Stamina Fix (Sürekli Güncelleme)
+-- Infinite Tackle & Stamina Loop
 task.spawn(function()
     while task.wait(0.1) do
-        if settings.infStamina then
-            pcall(function()
-                local char = LocalPlayer.Character
-                -- Stamina objesini karakterin içinde veya "Data" klasöründe arar
-                local staminaObj = char:FindFirstChild("Stamina") or LocalPlayer:FindFirstChild("Stamina") or char:FindFirstChild("StaminaValues")
-                if staminaObj then
-                    if staminaObj:IsA("NumberValue") or staminaObj:IsA("IntValue") then
-                        staminaObj.Value = 100
-                    end
-                end
-                -- Alternatif: Bazı oyunlar stamina'yı bir script içinde saklar, hızı yüksek tutarak dolaylı bypass yaparız
-                if char:FindFirstChild("Humanoid") then
-                    char.Humanoid.JumpPower = 50 
-                end
-            end)
-        end
-    end
-end)
-
--- Infinite Jump Fix (Fiziksel İtme)
-UserInputService.JumpRequest:Connect(function()
-    if settings.infJump then
         local char = LocalPlayer.Character
-        if char and char:FindFirstChild("HumanoidRootPart") then
-            -- Karakterin dikey hızını doğrudan değiştirir (Zıplama engelini aşar)
-            char.HumanoidRootPart.Velocity = Vector3.new(char.HumanoidRootPart.Velocity.X, 60, char.HumanoidRootPart.Velocity.Z)
+        if char then
+            -- Stamina Fix
+            if settings.infStamina then
+                local s = char:FindFirstChild("Stamina") or LocalPlayer:FindFirstChild("Stamina")
+                if s then s.Value = 100 end
+            end
+            -- Tackle Cooldown Bypass (Sınırsız Kayma)
+            if settings.infTackle then
+                local t = char:FindFirstChild("TackleCooldown") or char:FindFirstChild("SlideCooldown")
+                if t then t.Value = 0 end
+                -- Bazı versiyonlarda tackle bir BoolValue'dur
+                local canTackle = char:FindFirstChild("CanTackle")
+                if canTackle then canTackle.Value = true end
+            end
         end
     end
 end)
 
+-- Speed & Physics
 RunService.Heartbeat:Connect(function()
     local char = LocalPlayer.Character
-    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
+    if not char or not char:FindFirstChild("Humanoid") then return end
 
-    -- Magnet & Speed
+    -- Speed Hack (Daha güçlü Force)
+    if settings.speed then
+        char.Humanoid.WalkSpeed = settings.sVal
+        -- Karakterin yavaşlamasını önlemek için State kontrolü
+        if char.Humanoid.MoveDirection.Magnitude > 0 then
+            char.HumanoidRootPart.CFrame = char.HumanoidRootPart.CFrame + (char.Humanoid.MoveDirection * 0.5)
+        end
+    else
+        char.Humanoid.WalkSpeed = 16
+    end
+
+    -- Magnet
     if settings.magnet then
         local ball = workspace:FindFirstChild("Football") or workspace:FindFirstChild("Ball")
-        if ball and (ball.Position - char.HumanoidRootPart.Position).Magnitude < 20 then
+        if ball and (ball.Position - char.HumanoidRootPart.Position).Magnitude < 22 then
             firetouchinterest(char.HumanoidRootPart, ball, 0)
             firetouchinterest(char.HumanoidRootPart, ball, 1)
         end
     end
+end)
 
-    if char:FindFirstChild("Humanoid") then
-        char.Humanoid.WalkSpeed = settings.speed and settings.sVal or 16
+-- Inf Jump
+UserInputService.JumpRequest:Connect(function()
+    if settings.infJump and LocalPlayer.Character then
+        LocalPlayer.Character.HumanoidRootPart.Velocity = Vector3.new(LocalPlayer.Character.HumanoidRootPart.Velocity.X, 65, LocalPlayer.Character.HumanoidRootPart.Velocity.Z)
     end
 end)
 
@@ -161,4 +168,4 @@ UserInputService.InputBegan:Connect(function(i, p)
     if not p and i.KeyCode == settings.toggleKey then frame.Visible = not frame.Visible end
 end)
 
-print("RowNN V3.1 Fixed - Youtube: youtube.com/@RoWnn0")
+print("RowNN V3.2 FINAL - Youtube: youtube.com/@RoWnn0")
