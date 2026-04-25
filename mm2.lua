@@ -1,6 +1,6 @@
--- [[ MURDER MYSTERY 2 - RoWnn01 V6 FINAL ]] --
--- UI Toggle Key: INSERT
--- YouTube: RoWnn01
+-- [[ Murder Mystery 2 SCRIPT BY RoWnn0 - NO KEY - GOD MODE - ULTRA SPEED ]] --
+-- Toggle Key: INSERT
+-- YouTube: RoWnn0
 
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
@@ -8,33 +8,32 @@ local RS = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 
 -- PREVENT MULTIPLE LOADS
-if game:GetService("CoreGui"):FindFirstChild("RoWnn_Final") then
-    game:GetService("CoreGui"):FindFirstChild("RoWnn_Final"):Destroy()
+if game:GetService("CoreGui"):FindFirstChild("RoWnn0_Ultimate") then
+    game:GetService("CoreGui"):FindFirstChild("RoWnn0_Ultimate"):Destroy()
 end
 
 -- --- UI SETUP ---
 local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
-sg.Name = "RoWnn_Final"
+sg.Name = "RoWnn0_Ultimate"
 
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 550, 0, 400)
-main.Position = UDim2.new(0.5, -275, 0.5, -200)
-main.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+main.Size = UDim2.new(0, 560, 0, 420)
+main.Position = UDim2.new(0.5, -280, 0.5, -210)
+main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 main.BorderSizePixel = 0
-main.ClipsDescendants = true
+main.Active = true; main.Draggable = true
 
--- Modern Corner Radius
+-- Smooth Corners
 local corner = Instance.new("UICorner", main)
-corner.CornerRadius = UDim.new(0, 10)
+corner.CornerRadius = UDim.new(0, 12)
 
--- RGB GLOW (High Quality)
+-- Rainbow Glow Border ✨
 local glow = Instance.new("Frame", main)
-glow.Size = UDim2.new(1, 4, 1, 4)
-glow.Position = UDim2.new(0, -2, 0, -2)
+glow.Size = UDim2.new(1, 6, 1, 6)
+glow.Position = UDim2.new(0, -3, 0, -3)
 glow.ZIndex = 0
-glow.BackgroundColor3 = Color3.new(1, 1, 1)
 local gCorner = Instance.new("UICorner", glow)
-gCorner.CornerRadius = UDim.new(0, 12)
+gCorner.CornerRadius = UDim.new(0, 14)
 
 spawn(function()
     while wait() do
@@ -43,115 +42,84 @@ spawn(function()
     end
 end)
 
--- Sidebar & Topbar
-local topBar = Instance.new("Frame", main)
-topBar.Size = UDim2.new(1, 0, 0, 40)
-topBar.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
-topBar.BorderSizePixel = 0
-
-local title = Instance.new("TextLabel", topBar)
-title.Size = UDim2.new(1, -20, 1, 0)
-title.Position = UDim2.new(0, 15, 0, 0)
-title.Text = "RoWnn01 PREMIUM V6 - [INSERT TO TOGGLE]"
-title.TextColor3 = Color3.new(1, 1, 1)
-title.Font = Enum.Font.GothamBold
-title.TextSize = 14
-title.TextXAlignment = Enum.TextXAlignment.Left
-title.BackgroundTransparency = 1
-
+-- Sidebar
 local sideBar = Instance.new("Frame", main)
-sideBar.Size = UDim2.new(0, 140, 1, -40)
-sideBar.Position = UDim2.new(0, 0, 0, 40)
-sideBar.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+sideBar.Size = UDim2.new(0, 160, 1, 0)
+sideBar.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
 sideBar.BorderSizePixel = 0
+local sCorner = Instance.new("UICorner", sideBar)
 
 local container = Instance.new("Frame", main)
-container.Size = UDim2.new(1, -160, 1, -60)
-container.Position = UDim2.new(0, 150, 0, 50)
+container.Size = UDim2.new(1, -180, 1, -80)
+container.Position = UDim2.new(0, 170, 0, 60)
 container.BackgroundTransparency = 1
 
+-- Header Title 👑
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, -20, 0, 50)
+title.Position = UDim2.new(0, 10, 0, 5)
+title.Text = "🔥 Murder Mystery 2 SCRIPT BY RoWnn0 - NO KEY - GOD MODE - ULTRA SPEED 🔥"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 13
+title.BackgroundTransparency = 1
+
 -- --- TAB SYSTEM ---
-local function CreateTab(name, order)
+local function CreateTab(name, order, emoji)
     local btn = Instance.new("TextButton", sideBar)
-    btn.Size = UDim2.new(1, -10, 0, 35)
-    btn.Position = UDim2.new(0, 5, 0, 10 + (order * 40))
-    btn.Text = name
-    btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
-    btn.TextColor3 = Color3.new(0.6, 0.6, 0.6)
+    btn.Size = UDim2.new(1, -20, 0, 40)
+    btn.Position = UDim2.new(0, 10, 0, 60 + (order * 45))
+    btn.Text = emoji .. " " .. name
+    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    btn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
     btn.Font = Enum.Font.GothamSemibold
-    btn.BorderSizePixel = 0
-    local bCorner = Instance.new("UICorner", btn)
+    Instance.new("UICorner", btn)
     
     local page = Instance.new("ScrollingFrame", container)
     page.Size = UDim2.new(1, 0, 1, 0)
     page.BackgroundTransparency = 1
     page.Visible = false
-    page.ScrollBarThickness = 2
+    page.ScrollBarThickness = 0
     
     btn.MouseButton1Click:Connect(function()
         for _, p in pairs(container:GetChildren()) do p.Visible = false end
-        for _, b in pairs(sideBar:GetChildren()) do if b:IsA("TextButton") then b.TextColor3 = Color3.new(0.6, 0.6, 0.6) end end
+        for _, b in pairs(sideBar:GetChildren()) do if b:IsA("TextButton") then b.TextColor3 = Color3.new(0.7, 0.7, 0.7) end end
         page.Visible = true
         btn.TextColor3 = Color3.new(1, 1, 1)
     end)
+    
     local layout = Instance.new("UIListLayout", page)
-    layout.Padding = UDim.new(0, 8)
+    layout.Padding = UDim.new(0, 10)
     return page
 end
 
-local mainTab = CreateTab("AUTOMATION", 0)
-local combatTab = CreateTab("COMBAT", 1)
-local visualTab = CreateTab("VISUALS", 2)
-local playerTab = CreateTab("PLAYER", 3)
-local creditTab = CreateTab("CREDITS", 4)
-mainTab.Visible = true
+local combatTab = CreateTab("COMBAT", 0, "⚔️")
+local visualTab = CreateTab("VISUALS", 1, "👁️")
+local playerTab = CreateTab("PLAYER", 2, "⚡")
+local creditTab = CreateTab("CREDITS", 3, "💎")
+combatTab.Visible = true
 
--- --- ELEMENT BUILDER ---
+-- --- TOGGLE BUILDER ---
 local function AddToggle(parent, text, callback)
     local b = Instance.new("TextButton", parent)
-    b.Size = UDim2.new(1, -10, 0, 35)
-    b.Text = "  " .. text .. ": OFF"
+    b.Size = UDim2.new(1, -10, 0, 38)
+    b.Text = "  " .. text .. " [OFF]"
     b.TextXAlignment = Enum.TextXAlignment.Left
-    b.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-    b.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    b.TextColor3 = Color3.new(0.9, 0.9, 0.9)
     b.Font = Enum.Font.Gotham
-    local bC = Instance.new("UICorner", b)
+    Instance.new("UICorner", b)
     
     local act = false
     b.MouseButton1Click:Connect(function()
         act = not act
-        b.Text = "  " .. text .. (act and ": ON" or ": OFF")
-        b.BackgroundColor3 = act and Color3.fromRGB(180, 0, 0) or Color3.fromRGB(30, 30, 30)
-        b.TextColor3 = act and Color3.new(1, 1, 1) or Color3.new(0.8, 0.8, 0.8)
+        b.Text = "  " .. text .. (act and " [ON]" or " [OFF]")
+        b.BackgroundColor3 = act and Color3.fromRGB(200, 0, 0) or Color3.fromRGB(40, 40, 40)
         callback(act)
     end)
 end
 
 -- --- FEATURES ---
-
--- AUTOMATION
-AddToggle(mainTab, "Auto Farm Coins", function(v)
-    _G.F = v
-    spawn(function()
-        while _G.F do wait(0.1)
-            for _, c in pairs(workspace:GetDescendants()) do
-                if (c.Name == "CoinContainer" or c.Name == "CoinVisual") and LP.Character then
-                    LP.Character.HumanoidRootPart.CFrame = c.CFrame
-                end
-            end
-        end
-    end)
-end)
-
-AddToggle(mainTab, "Auto Grab Gun", function(v)
-    _G.G = v
-    spawn(function()
-        while _G.G do wait(0.2)
-            local gun = workspace:FindFirstChild("GunDrop")
-            if gun and LP.Character then LP.Character.HumanoidRootPart.CFrame = gun.CFrame end
-        end
-    end)
-end)
 
 -- COMBAT
 AddToggle(combatTab, "Kill Aura (Reach)", function(v)
@@ -169,8 +137,18 @@ AddToggle(combatTab, "Kill Aura (Reach)", function(v)
     end)
 end)
 
+AddToggle(combatTab, "Auto Grab Gun", function(v)
+    _G.Grab = v
+    spawn(function()
+        while _G.Grab do wait(0.2)
+            local gun = workspace:FindFirstChild("GunDrop")
+            if gun and LP.Character then LP.Character.HumanoidRootPart.CFrame = gun.CFrame end
+        end
+    end)
+end)
+
 -- VISUALS
-AddToggle(visualTab, "Ultra ESP", function(v)
+AddToggle(visualTab, "Ultra ESP Glow", function(v)
     _G.ESP = v
     spawn(function()
         while _G.ESP do wait(1)
@@ -188,21 +166,19 @@ AddToggle(visualTab, "Ultra ESP", function(v)
 end)
 
 -- PLAYER
-AddToggle(playerTab, "Noclip (Duvar Geçme)", function(v)
-    _G.N = v
-    RS.Stepped:Connect(function()
-        if _G.N and LP.Character then
-            for _, p in pairs(LP.Character:GetDescendants()) do if p:IsA("BasePart") then p.CanCollide = false end end
-        end
-    end)
+AddToggle(playerTab, "Ultra Speed", function(v)
+    LP.Character.Humanoid.WalkSpeed = v and 80 or 16
 end)
 
-AddToggle(playerTab, "Invisible (Gizli)", function(v)
-    if LP.Character then
-        for _, p in pairs(LP.Character:GetDescendants()) do
-            if p:IsA("BasePart") or p:IsA("Decal") then p.Transparency = v and 1 or 0 end
+AddToggle(playerTab, "God Mode (No Clip)", function(v)
+    _G.God = v
+    RS.Stepped:Connect(function()
+        if _G.God and LP.Character then
+            for _, part in pairs(LP.Character:GetDescendants()) do
+                if part:IsA("BasePart") then part.CanCollide = false end
+            end
         end
-    end
+    end)
 end)
 
 AddToggle(playerTab, "Infinite Jump", function(v)
@@ -213,22 +189,25 @@ end)
 -- CREDITS
 local yt = Instance.new("TextButton", creditTab)
 yt.Size = UDim2.new(1, -10, 0, 50)
-yt.Text = "YouTube: RoWnn01"
-yt.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+yt.Text = "📺 YouTube: RoWnn0"
+yt.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 yt.TextColor3 = Color3.new(1, 1, 1)
 yt.Font = Enum.Font.GothamBold
-local ytC = Instance.new("UICorner", yt)
+Instance.new("UICorner", yt)
+yt.MouseButton1Click:Connect(function() setclipboard("https://www.youtube.com/@RoWnn0") end)
 
-yt.MouseButton1Click:Connect(function() 
-    setclipboard("https://www.youtube.com/@RoWnn01") 
-    game.StarterGui:SetCore("SendNotification", {Title = "RoWnn01", Text = "Link Copied!"})
-end)
+local info = Instance.new("TextLabel", creditTab)
+info.Size = UDim2.new(1, -10, 0, 40)
+info.Text = "⌨️ Toggle Key: INSERT"
+info.TextColor3 = Color3.new(1, 1, 1)
+info.BackgroundTransparency = 1
+info.Font = Enum.Font.Gotham
 
--- TOGGLE LOGIC (INSERT KEY)
+-- TOGGLE LOGIC
 UIS.InputBegan:Connect(function(i, g)
     if not g and i.KeyCode == Enum.KeyCode.Insert then
         main.Visible = not main.Visible
     end
 end)
 
-print("RoWnn01 V6 Loaded! Press INSERT to Toggle.")
+print("RoWnn0 MM2 Loaded! Press INSERT to Toggle.")
