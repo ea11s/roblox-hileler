@@ -1,5 +1,5 @@
--- [[ MM2 SCRIPT BY RoWnn0 V9.3 - WASD FLY & ORIGINAL ORDER ]] --
--- Toggle Key: INSERT | YouTube: RoWnn0
+-- [[ MM2 SCRIPT BY RoWnn0 V9.4 - FLY KEYBIND [F] - FINAL VERSION ]] --
+-- Menu: INSERT | Fly Toggle: F | YouTube: RoWnn0
 
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
@@ -44,7 +44,7 @@ container.BackgroundTransparency = 1
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1, -20, 0, 50)
 title.Position = UDim2.new(0, 10, 0, 5)
-title.Text = "🔥 MM2 V9.3 BY RoWnn0 - WASD FLY FIXED 🔥"
+title.Text = "🔥 MM2 V9.4 BY RoWnn0 - FLY KEY [F] 🔥"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 14
@@ -97,6 +97,7 @@ local function AddToggle(parent, text, callback)
         b.BackgroundColor3 = act and Color3.fromRGB(200, 0, 0) or Color3.fromRGB(40, 40, 40)
         callback(act)
     end)
+    return b
 end
 
 -- --- FEATURES ---
@@ -171,18 +172,19 @@ AddToggle(playerTab, "Infinite Jump", function(v)
     end)
 end)
 
--- NEW WASD FLY SYSTEM ✅
-AddToggle(playerTab, "WASD Fly (Uçma)", function(v)
-    _G.Fly = v
-    local speed = 50
-    if v then
+-- WASD FLY WITH KEYBIND [F] ✅
+local flyEnabled = false
+local flyBtn = AddToggle(playerTab, "WASD Fly (Key: F)", function(v)
+    flyEnabled = v
+    local speed = 60
+    if flyEnabled then
         local bv = Instance.new("BodyVelocity", LP.Character.HumanoidRootPart)
         bv.Name = "RoWnnFly"
         bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
         bv.Velocity = Vector3.new(0,0,0)
         
         spawn(function()
-            while _G.Fly do
+            while flyEnabled do
                 local direction = Vector3.new(0,0,0)
                 if UIS:IsKeyDown(Enum.KeyCode.W) then direction = direction + workspace.CurrentCamera.CFrame.LookVector end
                 if UIS:IsKeyDown(Enum.KeyCode.S) then direction = direction - workspace.CurrentCamera.CFrame.LookVector end
@@ -192,8 +194,36 @@ AddToggle(playerTab, "WASD Fly (Uçma)", function(v)
                 bv.Velocity = direction * speed
                 wait()
             end
-            bv:Destroy()
+            if bv then bv:Destroy() end
         end)
+    end
+end)
+
+-- Tuş Dinleyici (F için)
+UIS.InputBegan:Connect(function(input, gameProcessed)
+    if not gameProcessed and input.KeyCode == Enum.KeyCode.F then
+        flyEnabled = not flyEnabled
+        flyBtn.Text = "  WASD Fly (Key: F) " .. (flyEnabled and "[ON]" or "[OFF]")
+        flyBtn.BackgroundColor3 = flyEnabled and Color3.fromRGB(200, 0, 0) or Color3.fromRGB(40, 40, 40)
+        -- Fly logic'i tetikle
+        if flyEnabled then
+            local speed = 60
+            local bv = LP.Character.HumanoidRootPart:FindFirstChild("RoWnnFly") or Instance.new("BodyVelocity", LP.Character.HumanoidRootPart)
+            bv.Name = "RoWnnFly"
+            bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+            spawn(function()
+                while flyEnabled do
+                    local direction = Vector3.new(0,0,0)
+                    if UIS:IsKeyDown(Enum.KeyCode.W) then direction = direction + workspace.CurrentCamera.CFrame.LookVector end
+                    if UIS:IsKeyDown(Enum.KeyCode.S) then direction = direction - workspace.CurrentCamera.CFrame.LookVector end
+                    if UIS:IsKeyDown(Enum.KeyCode.A) then direction = direction - workspace.CurrentCamera.CFrame.LookVector:Cross(Vector3.new(0,1,0)) end
+                    if UIS:IsKeyDown(Enum.KeyCode.D) then direction = direction + workspace.CurrentCamera.CFrame.LookVector:Cross(Vector3.new(0,1,0)) end
+                    bv.Velocity = direction * speed
+                    wait()
+                end
+                if bv then bv:Destroy() end
+            end)
+        end
     end
 end)
 
@@ -213,5 +243,5 @@ yt.Size = UDim2.new(1, -10, 0, 50); yt.Text = "📺 YouTube: RoWnn0"; yt.Backgro
 Instance.new("UICorner", yt)
 yt.MouseButton1Click:Connect(function() setclipboard("https://www.youtube.com/@RoWnn0"); game.StarterGui:SetCore("SendNotification", {Title = "RoWnn0", Text = "Link Copied! ✅"}) end)
 
--- TOGGLE
+-- TOGGLE MENU
 UIS.InputBegan:Connect(function(i, g) if not g and i.KeyCode == Enum.KeyCode.Insert then main.Visible = not main.Visible end end)
