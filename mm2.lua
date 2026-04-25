@@ -1,4 +1,4 @@
--- [[ Murder Mystery 2 SCRIPT BY RoWnn0 - NO KEY - GOD MODE - ULTRA SPEED ]] --
+-- [[ Murder Mystery 2 SCRIPT BY RoWnn0 - NO KEY - NO CLIP - ULTRA SPEED ]] --
 -- Toggle Key: INSERT
 -- YouTube: RoWnn0
 
@@ -22,10 +22,7 @@ main.Position = UDim2.new(0.5, -280, 0.5, -210)
 main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 main.BorderSizePixel = 0
 main.Active = true; main.Draggable = true
-
--- Smooth Corners
-local corner = Instance.new("UICorner", main)
-corner.CornerRadius = UDim.new(0, 12)
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
 
 -- Rainbow Glow Border ✨
 local glow = Instance.new("Frame", main)
@@ -46,8 +43,7 @@ end)
 local sideBar = Instance.new("Frame", main)
 sideBar.Size = UDim2.new(0, 160, 1, 0)
 sideBar.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
-sideBar.BorderSizePixel = 0
-local sCorner = Instance.new("UICorner", sideBar)
+Instance.new("UICorner", sideBar)
 
 local container = Instance.new("Frame", main)
 container.Size = UDim2.new(1, -180, 1, -80)
@@ -58,7 +54,7 @@ container.BackgroundTransparency = 1
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1, -20, 0, 50)
 title.Position = UDim2.new(0, 10, 0, 5)
-title.Text = "🔥 Murder Mystery 2 SCRIPT BY RoWnn0 - NO KEY - GOD MODE - ULTRA SPEED 🔥"
+title.Text = "🔥 MM2 SCRIPT BY RoWnn0 - NO KEY - NO CLIP - ULTRA SPEED 🔥"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 13
@@ -122,14 +118,15 @@ end
 -- --- FEATURES ---
 
 -- COMBAT
-AddToggle(combatTab, "Kill Aura (Reach)", function(v)
-    _G.KA = v
+AddToggle(combatTab, "Auto Kill (All Players)", function(v)
+    _G.AutoKill = v
     spawn(function()
-        while _G.KA do wait(0.1)
+        while _G.AutoKill do wait(0.1)
             if LP.Character and LP.Character:FindFirstChild("Knife") then
                 for _, p in pairs(Players:GetPlayers()) do
-                    if p ~= LP and p.Character and (p.Character.HumanoidRootPart.Position - LP.Character.HumanoidRootPart.Position).Magnitude < 25 then
+                    if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
                         firetouchinterest(LP.Character.Knife.Handle, p.Character.HumanoidRootPart, 0)
+                        firetouchinterest(LP.Character.Knife.Handle, p.Character.HumanoidRootPart, 1)
                     end
                 end
             end
@@ -137,12 +134,16 @@ AddToggle(combatTab, "Kill Aura (Reach)", function(v)
     end)
 end)
 
-AddToggle(combatTab, "Auto Grab Gun", function(v)
-    _G.Grab = v
+AddToggle(combatTab, "Big Hitbox (Reach)", function(v)
+    _G.Hitbox = v
     spawn(function()
-        while _G.Grab do wait(0.2)
-            local gun = workspace:FindFirstChild("GunDrop")
-            if gun and LP.Character then LP.Character.HumanoidRootPart.CFrame = gun.CFrame end
+        while _G.Hitbox do wait(0.1)
+            for _, p in pairs(Players:GetPlayers()) do
+                if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                    p.Character.HumanoidRootPart.Size = Vector3.new(15, 15, 15)
+                    p.Character.HumanoidRootPart.Transparency = 0.7
+                end
+            end
         end
     end)
 end)
@@ -170,10 +171,10 @@ AddToggle(playerTab, "Ultra Speed", function(v)
     LP.Character.Humanoid.WalkSpeed = v and 80 or 16
 end)
 
-AddToggle(playerTab, "God Mode (No Clip)", function(v)
-    _G.God = v
+AddToggle(playerTab, "No Clip (Wall Pass)", function(v)
+    _G.NoClip = v
     RS.Stepped:Connect(function()
-        if _G.God and LP.Character then
+        if _G.NoClip and LP.Character then
             for _, part in pairs(LP.Character:GetDescendants()) do
                 if part:IsA("BasePart") then part.CanCollide = false end
             end
@@ -194,7 +195,15 @@ yt.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 yt.TextColor3 = Color3.new(1, 1, 1)
 yt.Font = Enum.Font.GothamBold
 Instance.new("UICorner", yt)
-yt.MouseButton1Click:Connect(function() setclipboard("https://www.youtube.com/@RoWnn0") end)
+
+yt.MouseButton1Click:Connect(function() 
+    setclipboard("https://www.youtube.com/@RoWnn0") 
+    game.StarterGui:SetCore("SendNotification", {
+        Title = "RoWnn0",
+        Text = "Link Successfully Copied! ✅",
+        Duration = 5
+    })
+end)
 
 local info = Instance.new("TextLabel", creditTab)
 info.Size = UDim2.new(1, -10, 0, 40)
@@ -210,4 +219,4 @@ UIS.InputBegan:Connect(function(i, g)
     end
 end)
 
-print("RoWnn0 MM2 Loaded! Press INSERT to Toggle.")
+print("RoWnn0 MM2 V7 Loaded! Press INSERT to Toggle.")
