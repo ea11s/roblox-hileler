@@ -1,4 +1,4 @@
--- [[ MM2 SCRIPT BY RoWnn0 V9.2 - ORIGINAL ORDER - ALL FEATURES ]] --
+-- [[ MM2 SCRIPT BY RoWnn0 V9.3 - WASD FLY & ORIGINAL ORDER ]] --
 -- Toggle Key: INSERT | YouTube: RoWnn0
 
 local Players = game:GetService("Players")
@@ -7,7 +7,7 @@ local RS = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 local Mouse = LP:GetMouse()
 
--- ESKİ MENÜYÜ TEMİZLE
+-- UI CLEANUP
 if game:GetService("CoreGui"):FindFirstChild("RoWnn0_Ultimate_V9") then
     game:GetService("CoreGui"):FindFirstChild("RoWnn0_Ultimate_V9"):Destroy()
 end
@@ -44,7 +44,7 @@ container.BackgroundTransparency = 1
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1, -20, 0, 50)
 title.Position = UDim2.new(0, 10, 0, 5)
-title.Text = "🔥 MM2 V9.2 BY RoWnn0 - ALL FEATURES FIXED 🔥"
+title.Text = "🔥 MM2 V9.3 BY RoWnn0 - WASD FLY FIXED 🔥"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 14
@@ -75,7 +75,6 @@ local function CreateTab(name, order, emoji)
     return page
 end
 
--- SIRALAMA ESKİSİ GİBİ: COMBAT - VISUALS - PLAYER - CREDITS
 local combatTab = CreateTab("COMBAT", 0, "⚔️")
 local visualTab = CreateTab("VISUALS", 1, "👁️")
 local playerTab = CreateTab("PLAYER", 2, "⚡")
@@ -131,7 +130,7 @@ AddToggle(combatTab, "Auto Kill (All Players)", function(v)
 end)
 
 -- 2. VISUALS
-AddToggle(visualTab, "Tracers (Red/Green)", function(v)
+AddToggle(visualTab, "Tracers (Line)", function(v)
     _G.Tracers = v
     spawn(function()
         while _G.Tracers do wait(0.01)
@@ -164,7 +163,7 @@ AddToggle(visualTab, "Ultra ESP Glow", function(v)
     end)
 end)
 
--- 3. PLAYER (İSTEDİĞİN ÖZELLİKLER BURADA)
+-- 3. PLAYER
 AddToggle(playerTab, "Infinite Jump", function(v)
     _G.InfJump = v
     UIS.JumpRequest:Connect(function()
@@ -172,15 +171,25 @@ AddToggle(playerTab, "Infinite Jump", function(v)
     end)
 end)
 
-AddToggle(playerTab, "Fly (Uçma)", function(v)
+-- NEW WASD FLY SYSTEM ✅
+AddToggle(playerTab, "WASD Fly (Uçma)", function(v)
     _G.Fly = v
+    local speed = 50
     if v then
         local bv = Instance.new("BodyVelocity", LP.Character.HumanoidRootPart)
         bv.Name = "RoWnnFly"
         bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        bv.Velocity = Vector3.new(0,0,0)
+        
         spawn(function()
             while _G.Fly do
-                bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * 100
+                local direction = Vector3.new(0,0,0)
+                if UIS:IsKeyDown(Enum.KeyCode.W) then direction = direction + workspace.CurrentCamera.CFrame.LookVector end
+                if UIS:IsKeyDown(Enum.KeyCode.S) then direction = direction - workspace.CurrentCamera.CFrame.LookVector end
+                if UIS:IsKeyDown(Enum.KeyCode.A) then direction = direction - workspace.CurrentCamera.CFrame.LookVector:Cross(Vector3.new(0,1,0)) end
+                if UIS:IsKeyDown(Enum.KeyCode.D) then direction = direction + workspace.CurrentCamera.CFrame.LookVector:Cross(Vector3.new(0,1,0)) end
+                
+                bv.Velocity = direction * speed
                 wait()
             end
             bv:Destroy()
