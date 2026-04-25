@@ -1,4 +1,4 @@
--- [[ Murder Mystery 2 SCRIPT BY RoWnn0 V9 FINAL - EVERYTHING INCLUDED ]] --
+-- [[ MM2 SCRIPT BY RoWnn0 V9.2 - ORIGINAL ORDER - ALL FEATURES ]] --
 -- Toggle Key: INSERT | YouTube: RoWnn0
 
 local Players = game:GetService("Players")
@@ -7,14 +7,14 @@ local RS = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 local Mouse = LP:GetMouse()
 
--- PREVENT MULTIPLE LOADS
-if game:GetService("CoreGui"):FindFirstChild("RoWnn0_V9_Final") then
-    game:GetService("CoreGui"):FindFirstChild("RoWnn0_V9_Final"):Destroy()
+-- ESKİ MENÜYÜ TEMİZLE
+if game:GetService("CoreGui"):FindFirstChild("RoWnn0_Ultimate_V9") then
+    game:GetService("CoreGui"):FindFirstChild("RoWnn0_Ultimate_V9"):Destroy()
 end
 
 -- --- UI SETUP ---
 local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
-sg.Name = "RoWnn0_V9_Final"
+sg.Name = "RoWnn0_Ultimate_V9"
 
 local main = Instance.new("Frame", sg)
 main.Size = UDim2.new(0, 560, 0, 420)
@@ -30,7 +30,7 @@ glow.ZIndex = 0
 Instance.new("UICorner", glow).CornerRadius = UDim.new(0, 14)
 spawn(function() while wait() do glow.BackgroundColor3 = Color3.fromHSV(tick() % 5 / 5, 0.7, 1) end end)
 
--- Sidebar & Tabs
+-- Sidebar
 local sideBar = Instance.new("Frame", main)
 sideBar.Size = UDim2.new(0, 160, 1, 0)
 sideBar.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
@@ -44,12 +44,13 @@ container.BackgroundTransparency = 1
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1, -20, 0, 50)
 title.Position = UDim2.new(0, 10, 0, 5)
-title.Text = "💎 MM2 V9 FINAL BY RoWnn0 - ALL FEATURES 💎"
+title.Text = "🔥 MM2 V9.2 BY RoWnn0 - ALL FEATURES FIXED 🔥"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 14
 title.BackgroundTransparency = 1
 
+-- --- TAB SYSTEM ---
 local function CreateTab(name, order, emoji)
     local btn = Instance.new("TextButton", sideBar)
     btn.Size = UDim2.new(1, -20, 0, 40)
@@ -59,8 +60,13 @@ local function CreateTab(name, order, emoji)
     btn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
     btn.Font = Enum.Font.GothamSemibold
     Instance.new("UICorner", btn)
+    
     local page = Instance.new("ScrollingFrame", container)
-    page.Size = UDim2.new(1, 0, 1, 0); page.BackgroundTransparency = 1; page.Visible = false; page.ScrollBarThickness = 0
+    page.Size = UDim2.new(1, 0, 1, 0)
+    page.BackgroundTransparency = 1
+    page.Visible = false
+    page.ScrollBarThickness = 0
+    
     btn.MouseButton1Click:Connect(function()
         for _, p in pairs(container:GetChildren()) do p.Visible = false end
         page.Visible = true
@@ -69,6 +75,7 @@ local function CreateTab(name, order, emoji)
     return page
 end
 
+-- SIRALAMA ESKİSİ GİBİ: COMBAT - VISUALS - PLAYER - CREDITS
 local combatTab = CreateTab("COMBAT", 0, "⚔️")
 local visualTab = CreateTab("VISUALS", 1, "👁️")
 local playerTab = CreateTab("PLAYER", 2, "⚡")
@@ -95,17 +102,14 @@ end
 
 -- --- FEATURES ---
 
--- COMBAT
+-- 1. COMBAT
 AddToggle(combatTab, "Sheriff Silent Aim", function(v)
     _G.SilentAim = v
     local g; g = hookmetamethod(game, "__index", function(self, k)
         if _G.SilentAim and self == Mouse and k == "Hit" then
             for _, p in pairs(Players:GetPlayers()) do
-                if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                    if p.Backpack:FindFirstChild("Knife") or p.Character:FindFirstChild("Knife") then
-                        local pos, vis = workspace.CurrentCamera:WorldToViewportPoint(p.Character.HumanoidRootPart.Position)
-                        if vis then return p.Character.HumanoidRootPart.CFrame end
-                    end
+                if p ~= LP and p.Character and (p.Backpack:FindFirstChild("Knife") or p.Character:FindFirstChild("Knife")) then
+                    return p.Character.HumanoidRootPart.CFrame
                 end
             end
         end
@@ -119,34 +123,71 @@ AddToggle(combatTab, "Auto Kill (All Players)", function(v)
         while _G.AK do wait(0.1)
             if LP.Character and LP.Character:FindFirstChild("Knife") then
                 for _, p in pairs(Players:GetPlayers()) do
-                    if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                        firetouchinterest(LP.Character.Knife.Handle, p.Character.HumanoidRootPart, 0)
-                    end
+                    if p ~= LP and p.Character then firetouchinterest(LP.Character.Knife.Handle, p.Character.HumanoidRootPart, 0) end
                 end
             end
         end
     end)
 end)
 
--- VISUALS
-AddToggle(visualTab, "Advanced Tracers", function(v)
+-- 2. VISUALS
+AddToggle(visualTab, "Tracers (Red/Green)", function(v)
     _G.Tracers = v
     spawn(function()
         while _G.Tracers do wait(0.01)
             for _, p in pairs(Players:GetPlayers()) do
                 if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
                     local line = p.Character:FindFirstChild("RoWnnLine") or Instance.new("SelectionPartLasso", p.Character)
-                    line.Name = "RoWnnLine"; line.Part = p.Character.HumanoidRootPart; line.Humanoid = LP.Character:FindFirstChild("Humanoid"); line.Visible = _G.Tracers
-                    local ray = Ray.new(LP.Character.HumanoidRootPart.Position, (p.Character.HumanoidRootPart.Position - LP.Character.HumanoidRootPart.Position).Unit * 500)
-                    local hit = workspace:FindPartOnRayWithIgnoreList(ray, {LP.Character, p.Character})
-                    line.Color3 = hit and Color3.new(1, 0, 0) or Color3.new(0, 1, 0)
+                    line.Name = "RoWnnLine"; line.Part = p.Character.HumanoidRootPart; line.Humanoid = LP.Character:FindFirstChild("Humanoid")
+                    line.Visible = _G.Tracers
+                    line.Color3 = Color3.new(0, 1, 0)
                 end
             end
         end
     end)
 end)
 
--- PLAYER
+AddToggle(visualTab, "Ultra ESP Glow", function(v)
+    _G.ESP = v
+    spawn(function()
+        while _G.ESP do wait(1)
+            for _, p in pairs(Players:GetPlayers()) do
+                if p ~= LP and p.Character then
+                    local h = p.Character:FindFirstChild("Highlight") or Instance.new("Highlight", p.Character)
+                    h.Enabled = _G.ESP
+                    if p.Backpack:FindFirstChild("Knife") or p.Character:FindFirstChild("Knife") then h.FillColor = Color3.new(1,0,0)
+                    elseif p.Backpack:FindFirstChild("Gun") or p.Character:FindFirstChild("Gun") then h.FillColor = Color3.new(0,0,1)
+                    else h.FillColor = Color3.new(0,1,0) end
+                end
+            end
+        end
+    end)
+end)
+
+-- 3. PLAYER (İSTEDİĞİN ÖZELLİKLER BURADA)
+AddToggle(playerTab, "Infinite Jump", function(v)
+    _G.InfJump = v
+    UIS.JumpRequest:Connect(function()
+        if _G.InfJump then LP.Character.Humanoid:ChangeState("Jumping") end
+    end)
+end)
+
+AddToggle(playerTab, "Fly (Uçma)", function(v)
+    _G.Fly = v
+    if v then
+        local bv = Instance.new("BodyVelocity", LP.Character.HumanoidRootPart)
+        bv.Name = "RoWnnFly"
+        bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
+        spawn(function()
+            while _G.Fly do
+                bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * 100
+                wait()
+            end
+            bv:Destroy()
+        end)
+    end
+end)
+
 AddToggle(playerTab, "Ultra Speed (80)", function(v) LP.Character.Humanoid.WalkSpeed = v and 80 or 16 end)
 AddToggle(playerTab, "No Clip", function(v)
     _G.NC = v
@@ -157,28 +198,7 @@ AddToggle(playerTab, "No Clip", function(v)
     end)
 end)
 
--- BURASI SENİN İSTEDİĞİN YER! ✅
-AddToggle(playerTab, "Infinite Jump", function(v)
-    _G.InfJump = v
-    UIS.JumpRequest:Connect(function()
-        if _G.InfJump then LP.Character.Humanoid:ChangeState("Jumping") end
-    end)
-end)
-
-AddToggle(playerTab, "Fly (Uçma Modu)", function(v)
-    _G.Fly = v
-    local bv = Instance.new("BodyVelocity")
-    bv.Velocity = Vector3.new(0,0,0)
-    bv.MaxForce = Vector3.new(math.huge, math.huge, math.huge)
-    if v then bv.Parent = LP.Character.HumanoidRootPart else if LP.Character.HumanoidRootPart:FindFirstChild("BodyVelocity") then LP.Character.HumanoidRootPart.BodyVelocity:Destroy() end end
-    spawn(function()
-        while _G.Fly do wait()
-            bv.Velocity = workspace.CurrentCamera.CFrame.LookVector * 50
-        end
-    end)
-end)
-
--- CREDITS
+-- 4. CREDITS
 local yt = Instance.new("TextButton", creditTab)
 yt.Size = UDim2.new(1, -10, 0, 50); yt.Text = "📺 YouTube: RoWnn0"; yt.BackgroundColor3 = Color3.fromRGB(255, 0, 0); yt.TextColor3 = Color3.new(1, 1, 1); yt.Font = Enum.Font.GothamBold
 Instance.new("UICorner", yt)
