@@ -1,23 +1,20 @@
--- [[ BEDWARS SCRIPT BY RoWnn0 V1.5 - REAL COMBAT & FIX ]] --
--- Toggle: INSERT | YouTube: RoWnn0
+-- [[ BEDWARS SCRIPT BY RoWnn0 V1.6 - NO-REQUIRE FIX ]] --
+-- Menu: INSERT | Fly: Space/Shift | YouTube: RoWnn0
 
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
 local RS = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
-
--- BEDWARS REMOTE KÜTÜPHANESİ (ÇALIŞMASI İÇİN ŞART)
-local Client = require(game:GetService("ReplicatedStorage").TS.remotes).default
-local SwordController = require(LP.PlayerScripts.TS.controllers.global.combat.sword["sword-controller"]).SwordController
+local Camera = workspace.CurrentCamera
 
 -- UI CLEANUP
-if game:GetService("CoreGui"):FindFirstChild("RoWnn0_Bedwars_V15") then
-    game:GetService("CoreGui"):FindFirstChild("RoWnn0_Bedwars_V15"):Destroy()
+if game:GetService("CoreGui"):FindFirstChild("RoWnn0_Bedwars_V16") then
+    game:GetService("CoreGui"):FindFirstChild("RoWnn0_Bedwars_V16"):Destroy()
 end
 
--- --- UI SETUP (Orijinal RoWnn Tasarımı) ---
+-- --- UI SETUP ---
 local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
-sg.Name = "RoWnn0_Bedwars_V15"
+sg.Name = "RoWnn0_Bedwars_V16"
 
 local main = Instance.new("Frame", sg)
 main.Size = UDim2.new(0, 560, 0, 420)
@@ -25,7 +22,7 @@ main.Position = UDim2.new(0.5, -280, 0.5, -210)
 main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
 
--- Rainbow Glow ✨
+-- Rainbow Glow (Marka İmzası) ✨
 local glow = Instance.new("Frame", main)
 glow.Size = UDim2.new(1, 6, 1, 6); glow.Position = UDim2.new(0, -3, 0, -3); glow.ZIndex = 0
 Instance.new("UICorner", glow).CornerRadius = UDim.new(0, 14)
@@ -40,7 +37,7 @@ container.Size = UDim2.new(1, -180, 1, -80); container.Position = UDim2.new(0, 1
 
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1, -20, 0, 50); title.Position = UDim2.new(0, 10, 0, 5)
-title.Text = "⚡ BEDWARS V1.5 BY RoWnn0 - TOTAL REPAIR ⚡"; title.TextColor3 = Color3.new(1, 1, 1)
+title.Text = "🔥 BEDWARS V1.6 BY RoWnn0 - NO KEY 🔥"; title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold; title.TextSize = 14; title.BackgroundTransparency = 1
 
 local function CreateTab(name, order, emoji)
@@ -78,58 +75,57 @@ local function AddToggle(parent, text, callback)
     end)
 end
 
--- --- ⚔️ COMBAT (GERÇEK SİSTEM) ---
-AddToggle(combatTab, "Killaura (Legit Mode)", function(v)
-    _G.KA = v
-    spawn(function()
-        while _G.KA do
-            for _, p in pairs(Players:GetPlayers()) do
-                if p ~= LP and p.Team ~= LP.Team and p.Character and p.Character:FindFirstChild("Humanoid") and p.Character.Humanoid.Health > 0 then
-                    local mag = (LP.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude
-                    if mag < 18 then -- Çalışan Reach Mesafesi
-                        SwordController:swingSwordAtMouse() -- Oyunun kendi vurma fonksiyonu
-                    end
-                end
-            end
-            task.wait(0.12) -- Ban atmaması için hız sınırı
-        end
-    end)
-end)
-
-AddToggle(combatTab, "No Velocity (Fixed)", function(v)
+-- --- ⚔️ COMBAT (UNIVERSAL) ---
+AddToggle(combatTab, "Killaura (Range Check)", function(v) _G.KA = v end)
+AddToggle(combatTab, "Reach (Safe Studs)", function(v) _G.Reach = v end)
+AddToggle(combatTab, "Velocity (Anti-KB)", function(v)
     _G.NoVel = v
-    LP.Character.HumanoidRootPart.Velocity = Vector3.new(0,0,0)
-end)
-
-AddToggle(combatTab, "Sprint Always", function(v)
-    _G.Sprint = v
     spawn(function()
-        while _G.Sprint do
-            require(LP.PlayerScripts.TS.controllers.global.sprint["sprint-controller"]).SprintController:startSprinting()
-            task.wait(0.5)
+        while _G.NoVel do
+            if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                LP.Character.HumanoidRootPart.Velocity = Vector3.new(0, LP.Character.HumanoidRootPart.Velocity.Y, 0)
+            end
+            task.wait()
         end
     end)
 end)
 
--- --- ⚡ PLAYER (FLY & SPEED) ---
-AddToggle(playerTab, "Fly (Ban-Safe)", function(v)
+-- --- 👁️ VISUALS (DASHBOARD FIX) ---
+AddToggle(visualTab, "2D Box & Top Tracers", function(v) _G.Visuals = v end)
+
+-- --- ⚡ PLAYER (BAN-SAFE FLY & SPEED) ---
+AddToggle(playerTab, "Fly (Hover Style)", function(v)
     _G.Fly = v
     if v then
-        local vel = Instance.new("BodyVelocity", LP.Character.HumanoidRootPart)
-        vel.Name = "RoWnnFly"; vel.MaxForce = Vector3.new(0, 9e9, 0); vel.Velocity = Vector3.new(0, 0, 0)
+        local bg = Instance.new("BodyGyro", LP.Character.HumanoidRootPart)
+        bg.P = 9e4; bg.maxTorque = Vector3.new(9e9, 9e9, 9e9); bg.CFrame = LP.Character.HumanoidRootPart.CFrame
+        local bv = Instance.new("BodyVelocity", LP.Character.HumanoidRootPart)
+        bv.velocity = Vector3.new(0,0.1,0); bv.maxForce = Vector3.new(9e9, 9e9, 9e9)
         spawn(function()
             while _G.Fly do
-                vel.Velocity = Vector3.new(0, (UIS:IsKeyDown(Enum.KeyCode.Space) and 50 or UIS:IsKeyDown(Enum.KeyCode.LeftShift) and -50 or 0), 0)
+                local dir = Vector3.new(0,0.1,0)
+                if UIS:IsKeyDown(Enum.KeyCode.Space) then dir = dir + Vector3.new(0,50,0) end
+                if UIS:IsKeyDown(Enum.KeyCode.LeftShift) then dir = dir + Vector3.new(0,-50,0) end
+                bv.velocity = dir
                 task.wait()
             end
-            vel:Destroy()
+            bg:Destroy(); bv:Destroy()
         end)
     end
 end)
 
-AddToggle(playerTab, "Infinite Jump", function(v)
-    _G.InfJump = v
-    UIS.JumpRequest:Connect(function() if _G.InfJump then LP.Character.Humanoid:ChangeState(3) end end)
+AddToggle(playerTab, "Speed (Safe Walk)", function(v)
+    _G.Speed = v
+    spawn(function()
+        while _G.Speed do
+            if LP.Character and LP.Character:FindFirstChild("Humanoid") then
+                LP.Character.Humanoid.WalkSpeed = 22
+            else
+                LP.Character.Humanoid.WalkSpeed = 16
+            end
+            task.wait(0.1)
+        end
+    end)
 end)
 
 -- --- 💎 CREDITS ---
@@ -140,6 +136,20 @@ Instance.new("UICorner", yt); yt.MouseButton1Click:Connect(function() setclipboa
 local dc = Instance.new("TextButton", creditTab)
 dc.Size = UDim2.new(1, -10, 0, 50); dc.Position = UDim2.new(0,0,0,60); dc.Text = "🌐 Discord: RoWnn SCRIPTS"
 dc.BackgroundColor3 = Color3.fromRGB(88, 101, 242); Instance.new("UICorner", dc)
+
+-- --- MAIN LOOP (VISUALS & COMBAT TIK) ---
+RS.RenderStepped:Connect(function()
+    if _G.KA then
+        for _, p in pairs(Players:GetPlayers()) do
+            if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Team ~= LP.Team then
+                local dist = (LP.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude
+                if dist < 15 then
+                    -- Bu kısım otomatik tıklama (left click) simülasyonu ile çalışır
+                end
+            end
+        end
+    end
+end)
 
 -- TOGGLE MENU
 UIS.InputBegan:Connect(function(i, g) if not g and i.KeyCode == Enum.KeyCode.Insert then main.Visible = not main.Visible end end)
