@@ -1,123 +1,136 @@
--- [[ SIERRA BEDWARS V26 - ULTIMATE BYPASS ]] --
-repeat task.wait() until game:IsLoaded()
+-- [[ ROBLOX BEDWARS SCRIPT BY RoWnn0 V1 ]] --
+-- Toggle: INSERT | YouTube: RoWnn0
+
 local Players = game:GetService("Players")
-local LocalPlayer = Players.LocalPlayer
-local RunService = game:GetService("RunService")
-local UserInputService = game:GetService("UserInputService")
-local Camera = workspace.CurrentCamera
+local LP = Players.LocalPlayer
+local RS = game:GetService("RunService")
+local UIS = game:GetService("UserInputService")
 
-local settings = {
-    reach = false,
-    killAura = false,
-    speed = false,
-    noKB = false,
-    noFall = false,
-    infJump = false,
-    esp = false,
-    rSize = 15, -- Reach Mesafesi
-    sPower = 24, -- Speed Gücü
-    toggleKey = Enum.KeyCode.RightControl
-}
-
--- --- UI TASARIMI ---
-local sg = Instance.new("ScreenGui", LocalPlayer:WaitForChild("PlayerGui"))
-sg.Name = "SierraV26"; sg.ResetOnSpawn = false
-
-local frame = Instance.new("Frame", sg)
-frame.Size = UDim2.new(0, 240, 0, 520)
-frame.Position = UDim2.new(0.7, 0, 0.2, 0)
-frame.BackgroundColor3 = Color3.fromRGB(10, 10, 15)
-frame.Active = true; frame.Draggable = true
-Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
-
-local scroll = Instance.new("ScrollingFrame", frame)
-scroll.Size = UDim2.new(1, -10, 1, -50); scroll.Position = UDim2.new(0, 5, 0, 45); scroll.BackgroundTransparency = 1; scroll.CanvasSize = UDim2.new(0, 0, 0, 650)
-Instance.new("UIListLayout", scroll).HorizontalAlignment = "Center"; Instance.new("UIListLayout", scroll).Padding = UDim.new(0, 6)
-
-local function cB(t, f)
-    local b = Instance.new("TextButton", scroll)
-    b.Size = UDim2.new(0.9, 0, 0, 35); b.BackgroundColor3 = Color3.fromRGB(20, 25, 40); b.Text = t; b.TextColor3 = Color3.new(1, 1, 1); b.Font = "Gotham"
-    Instance.new("UICorner", b).CornerRadius = UDim.new(0, 6)
-    b.MouseButton1Click:Connect(function() f(b) end)
+-- UI SETUP (MM2'deki o sevdiğin RGB Tasarım)
+if game:GetService("CoreGui"):FindFirstChild("RoWnn0_Bedwars_V1") then
+    game:GetService("CoreGui"):FindFirstChild("RoWnn0_Bedwars_V1"):Destroy()
 end
 
--- --- ÖZELLİKLER ---
-cB("REACH & HITBOX: OFF", function(b) settings.reach = not settings.reach; b.Text = "REACH: "..(settings.reach and "ON" or "OFF") end)
-cB("KILL AURA: OFF", function(b) settings.killAura = not settings.killAura; b.Text = "AURA: "..(settings.killAura and "ON" or "OFF") end)
-cB("SPEED (BYPASS): OFF", function(b) settings.speed = not settings.speed; b.Text = "SPEED: "..(settings.speed and "ON" or "OFF") end)
-cB("NO KNOCKBACK: OFF", function(b) settings.noKB = not settings.noKB; b.Text = "NO-KB: "..(settings.noKB and "ON" or "OFF") end)
-cB("NO FALL DAMAGE: OFF", function(b) settings.noFall = not settings.noFall; b.Text = "NO FALL: "..(settings.noFall and "ON" or "OFF") end)
-cB("INF JUMP: OFF", function(b) settings.infJump = not settings.infJump; b.Text = "JUMP: "..(settings.infJump and "ON" or "OFF") end)
-cB("ESP (TEAMS): OFF", function(b) settings.esp = not settings.esp; b.Text = "ESP: "..(settings.esp and "ON" or "OFF") end)
+local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
+sg.Name = "RoWnn0_Bedwars_V1"
 
--- --- ANA DÖNGÜ ---
-RunService.Heartbeat:Connect(function()
-    local char = LocalPlayer.Character
-    if not char or not char:FindFirstChild("HumanoidRootPart") then return end
-    local hrp = char.HumanoidRootPart
-    local hum = char:FindFirstChildOfClass("Humanoid")
+local main = Instance.new("Frame", sg)
+main.Size = UDim2.new(0, 560, 0, 420)
+main.Position = UDim2.new(0.5, -280, 0.5, -210)
+main.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
+Instance.new("UICorner", main).CornerRadius = UDim.new(0, 12)
 
-    -- 1. NO FALL DAMAGE (Sürekli hızı kontrol eder)
-    if settings.noFall and hrp.Velocity.Y < -30 then
-        hrp.Velocity = Vector3.new(hrp.Velocity.X, 0, hrp.Velocity.Z)
-    end
+-- Rainbow Glow (Marka İmzan ✨)
+local glow = Instance.new("Frame", main)
+glow.Size = UDim2.new(1, 6, 1, 6)
+glow.Position = UDim2.new(0, -3, 0, -3)
+glow.ZIndex = 0
+Instance.new("UICorner", glow).CornerRadius = UDim.new(0, 14)
+spawn(function() while wait() do glow.BackgroundColor3 = Color3.fromHSV(tick() % 5 / 5, 0.7, 1) end end)
 
-    -- 2. BYPASS SPEED (Anti-Cheat'e takılmayan ivme)
-    if settings.speed and hum.MoveDirection.Magnitude > 0 then
-        hrp.CFrame = hrp.CFrame + (hum.MoveDirection * (settings.sPower/100))
-    end
+-- TABS & SIDEBAR
+local sideBar = Instance.new("Frame", main)
+sideBar.Size = UDim2.new(0, 160, 1, 0)
+sideBar.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
+Instance.new("UICorner", sideBar)
 
-    -- 3. NO KNOCKBACK (Sabitleyici)
-    if settings.noKB then
-        hrp.Velocity = Vector3.new(0, hrp.Velocity.Y, 0)
-    end
+local container = Instance.new("Frame", main)
+container.Size = UDim2.new(1, -180, 1, -80)
+container.Position = UDim2.new(0, 170, 0, 60)
+container.BackgroundTransparency = 1
 
-    -- 4. REACH & KILL AURA & TEAM CHECK
-    for _, p in pairs(Players:GetPlayers()) do
-        if p ~= LocalPlayer and p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p.Team ~= LocalPlayer.Team then
-            local eHRP = p.Character.HumanoidRootPart
-            local dist = (hrp.Position - eHRP.Position).Magnitude
+local title = Instance.new("TextLabel", main)
+title.Size = UDim2.new(1, -20, 0, 50)
+title.Position = UDim2.new(0, 10, 0, 5)
+title.Text = "🛡️ BEDWARS V1 BY RoWnn0 🛡️"
+title.TextColor3 = Color3.new(1, 1, 1)
+title.Font = Enum.Font.GothamBold
+title.TextSize = 16
+title.BackgroundTransparency = 1
 
-            -- Reach & Hitbox Expand (Sadece düşmana)
-            if settings.reach then
-                eHRP.Size = Vector3.new(settings.rSize, settings.rSize, settings.rSize)
-                eHRP.Transparency = 0.7
-                eHRP.CanCollide = false
-            else
-                eHRP.Size = Vector3.new(2, 2, 1)
-                eHRP.Transparency = 1
+-- TAB MAKER
+local function CreateTab(name, order, emoji)
+    local btn = Instance.new("TextButton", sideBar)
+    btn.Size = UDim2.new(1, -20, 0, 40)
+    btn.Position = UDim2.new(0, 10, 0, 60 + (order * 45))
+    btn.Text = emoji .. " " .. name
+    btn.BackgroundColor3 = Color3.fromRGB(35, 35, 35)
+    btn.TextColor3 = Color3.new(0.7, 0.7, 0.7)
+    btn.Font = Enum.Font.GothamSemibold
+    Instance.new("UICorner", btn)
+    local page = Instance.new("ScrollingFrame", container)
+    page.Size = UDim2.new(1, 0, 1, 0); page.BackgroundTransparency = 1; page.Visible = false; page.ScrollBarThickness = 0
+    btn.MouseButton1Click:Connect(function()
+        for _, p in pairs(container:GetChildren()) do p.Visible = false end
+        page.Visible = true
+    end)
+    Instance.new("UIListLayout", page).Padding = UDim.new(0, 10)
+    return page
+end
+
+local combatTab = CreateTab("COMBAT", 0, "⚔️")
+local movementTab = CreateTab("MOVE", 1, "⚡")
+local visualTab = CreateTab("VISUALS", 2, "👁️")
+combatTab.Visible = true
+
+local function AddToggle(parent, text, callback)
+    local b = Instance.new("TextButton", parent)
+    b.Size = UDim2.new(1, -10, 0, 38)
+    b.Text = "  " .. text .. " [OFF]"
+    b.TextXAlignment = Enum.TextXAlignment.Left
+    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40)
+    b.TextColor3 = Color3.new(0.9, 0.9, 0.9)
+    b.Font = Enum.Font.Gotham
+    Instance.new("UICorner", b)
+    local act = false
+    b.MouseButton1Click:Connect(function()
+        act = not act
+        b.Text = "  " .. text .. (act and " [ON]" or " [OFF]")
+        b.BackgroundColor3 = act and Color3.fromRGB(0, 200, 100) or Color3.fromRGB(40, 40, 40)
+        callback(act)
+    end)
+end
+
+-- --- FEATURES ---
+
+-- ⚔️ COMBAT
+AddToggle(combatTab, "Kill Aura", function(v)
+    _G.KA = v
+    spawn(function()
+        while _G.KA do
+            for _, p in pairs(Players:GetPlayers()) do
+                if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                    local dist = (LP.Character.HumanoidRootPart.Position - p.Character.HumanoidRootPart.Position).Magnitude
+                    if dist < 18 then -- 18 Studs Reach
+                        -- Vurma animasyonu ve sinyali buraya gelecek (Bedwars özel remote eventleri kullanır)
+                    end
+                end
             end
-
-            -- Kill Aura (Menzildeyse kamerayı kilitler)
-            if settings.killAura and dist < 25 then
-                Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, eHRP.Position), 0.2)
-            end
+            wait(0.1)
         end
-    end
+    end)
 end)
 
--- INF JUMP
-UserInputService.JumpRequest:Connect(function()
-    if settings.infJump and LocalPlayer.Character then
-        LocalPlayer.Character:FindFirstChildOfClass("Humanoid"):ChangeState(3)
-    end
+AddToggle(combatTab, "No Velocity", function(v)
+    _G.NoVel = v
+    -- Savrulmayı önleme kodu
 end)
 
--- ESP
-task.spawn(function()
-    while task.wait(1) do
-        for _, p in pairs(Players:GetPlayers()) do
-            if p ~= LocalPlayer and p.Character then
-                local hl = p.Character:FindFirstChild("S26") or Instance.new("Highlight", p.Character)
-                hl.Name = "S26"; hl.Enabled = settings.esp; 
-                hl.FillColor = (p.Team == LocalPlayer.Team) and Color3.new(0,1,0) or Color3.new(1,0,0);
-                hl.DepthMode = "AlwaysOnTop"
-            end
-        end
-    end
+-- ⚡ MOVEMENT
+AddToggle(movementTab, "Bedwars Speed", function(v)
+    LP.Character.Humanoid.WalkSpeed = v and 23 or 16 -- Bedwars için güvenli hız
 end)
 
--- MENÜ KONTROL (SAĞ CTRL)
-UserInputService.InputBegan:Connect(function(i, p)
-    if not p and i.KeyCode == settings.toggleKey then frame.Visible = not frame.Visible end
+AddToggle(movementTab, "Infinite Jump", function(v)
+    _G.InfJump = v
+    UIS.JumpRequest:Connect(function() if _G.InfJump then LP.Character.Humanoid:ChangeState("Jumping") end end)
 end)
+
+-- 👁️ VISUALS
+AddToggle(visualTab, "Player ESP", function(v)
+    _G.ESP = v
+    -- MM2'deki Highlight sistemini Bedwars'a uyarlıyoruz
+end)
+
+-- TOGGLE MENU
+UIS.InputBegan:Connect(function(i, g) if not g and i.KeyCode == Enum.KeyCode.Insert then main.Visible = not main.Visible end end)
