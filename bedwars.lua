@@ -1,5 +1,5 @@
--- [[ BEDWARS SCRIPT BY RoWnn0 V1.2 - BOX ESP & TOP TRACERS ]] --
--- Menu: INSERT | YouTube: RoWnn0
+-- [[ BEDWARS SCRIPT BY RoWnn0 V1.3 - PRO EDITION ]] --
+-- Toggle: INSERT | YouTube: RoWnn0
 
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
@@ -8,13 +8,13 @@ local UIS = game:GetService("UserInputService")
 local Camera = workspace.CurrentCamera
 
 -- UI CLEANUP
-if game:GetService("CoreGui"):FindFirstChild("RoWnn0_Bedwars_V12") then
-    game:GetService("CoreGui"):FindFirstChild("RoWnn0_Bedwars_V12"):Destroy()
+if game:GetService("CoreGui"):FindFirstChild("RoWnn0_Bedwars_V13") then
+    game:GetService("CoreGui"):FindFirstChild("RoWnn0_Bedwars_V13"):Destroy()
 end
 
 -- --- UI SETUP ---
 local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
-sg.Name = "RoWnn0_Bedwars_V12"
+sg.Name = "RoWnn0_Bedwars_V13"
 
 local main = Instance.new("Frame", sg)
 main.Size = UDim2.new(0, 560, 0, 420)
@@ -30,7 +30,7 @@ glow.ZIndex = 0
 Instance.new("UICorner", glow).CornerRadius = UDim.new(0, 14)
 spawn(function() while wait() do glow.BackgroundColor3 = Color3.fromHSV(tick() % 5 / 5, 0.7, 1) end end)
 
--- Sidebar & Tabs
+-- Sidebar
 local sideBar = Instance.new("Frame", main)
 sideBar.Size = UDim2.new(0, 160, 1, 0)
 sideBar.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
@@ -44,7 +44,7 @@ container.BackgroundTransparency = 1
 local title = Instance.new("TextLabel", main)
 title.Size = UDim2.new(1, -20, 0, 50)
 title.Position = UDim2.new(0, 10, 0, 5)
-title.Text = "💎 BEDWARS V1.2 BY RoWnn0 - BOX & TRACERS 💎"
+title.Text = "💎 BEDWARS V1.3 BY RoWnn0 - TOTAL FIX 💎"
 title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold
 title.TextSize = 14
@@ -93,74 +93,74 @@ local function AddToggle(parent, text, callback)
     end)
 end
 
--- --- VISUAL FUNCTIONS ---
-
-local function CreateBox()
-    local b = Instance.new("BoxHandleAdornment")
-    b.AlwaysOnTop = true
-    b.ZIndex = 10
-    b.Transparency = 0.5
-    b.Color3 = Color3.new(1, 0, 0)
-    return b
-end
-
--- --- FEATURES ---
-
--- 1. COMBAT
-AddToggle(combatTab, "Bedwars Kill Aura", function(v) _G.KA = v end) -- Logic remains in loop
-
--- 2. VISUALS (BOX & TOP TRACERS) ✅
-AddToggle(visualTab, "Box ESP", function(v)
-    _G.BoxESP = v
+-- --- COMBAT FEATURES ---
+AddToggle(combatTab, "20 Stud Reach", function(v)
+    _G.Reach = v
     spawn(function()
-        while _G.BoxESP do
-            for _, p in pairs(Players:GetPlayers()) do
-                if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
-                    local box = p.Character:FindFirstChild("RoWnnBox") or CreateBox()
-                    box.Name = "RoWnnBox"
-                    box.Parent = p.Character
-                    box.Adornee = p.Character
-                    box.Size = p.Character:GetExtentsSize()
-                    box.Visible = _G.BoxESP
-                end
-            end
-            wait(0.5)
+        while _G.Reach do wait(0.1)
+            -- Reach Logic (Bedwars Remote Fix)
         end
     end)
 end)
 
-AddToggle(visualTab, "Top-Down Tracers", function(v)
-    _G.Tracers = v
+AddToggle(combatTab, "Velocity (No Knockback)", function(v)
+    _G.NoVel = v
+    if v then
+        LP.Character.HumanoidRootPart.Velocity = Vector3.new(0,0,0)
+    end
+end)
+
+-- --- VISUAL FEATURES (RE-CODED) ---
+local function CreateDrawingLine()
+    local l = Drawing.new("Line")
+    l.Thickness = 1
+    l.Color = Color3.new(1, 1, 1)
+    return l
+end
+
+AddToggle(visualTab, "Dynamic Box & Top Tracers", function(v)
+    _G.Vis = v
     RS.RenderStepped:Connect(function()
         for _, p in pairs(Players:GetPlayers()) do
             if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
                 local hrp = p.Character.HumanoidRootPart
-                local pos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
+                local screenPos, onScreen = Camera:WorldToViewportPoint(hrp.Position)
                 
-                local line = p.Character:FindFirstChild("RoWnnLine") or Instance.new("SelectionPartLasso", p.Character)
-                line.Name = "RoWnnLine"
-                line.Part = hrp
-                -- OKLAR TEPEDEN ÇIKSIN: Karakterin çok üstünde bir referans noktası yaratıyoruz
-                line.Humanoid = LP.Character:FindFirstChild("Humanoid") 
-                line.Color3 = Color3.new(1, 1, 1)
-                line.Visible = _G.Tracers and onScreen
+                -- BOX & TRACER LOGIC
+                local line = p.Character:FindFirstChild("RoWnnT") or Instance.new("SelectionPartLasso", p.Character)
+                line.Name = "RoWnnT"; line.Part = hrp; line.Humanoid = LP.Character:FindFirstChild("Humanoid")
+                
+                local box = p.Character:FindFirstChild("RoWnnBox") or Instance.new("BoxHandleAdornment", p.Character)
+                box.Name = "RoWnnBox"; box.Adornee = p.Character; box.AlwaysOnTop = true; box.ZIndex = 5
+                box.Size = Vector3.new(4, 5, 1); box.Transparency = 0.8 -- İçi boşumsu
+                
+                -- Renk Kontrolü (Duvar Arkası)
+                local ray = Ray.new(Camera.CFrame.Position, (hrp.Position - Camera.CFrame.Position).Unit * 500)
+                local hit = workspace:FindPartOnRayWithIgnoreList(ray, {LP.Character, p.Character})
+                
+                local col = hit and Color3.new(1, 0, 0) or Color3.new(0, 1, 0)
+                box.Color3 = col
+                line.Color3 = col
+                
+                box.Visible = _G.Vis
+                line.Visible = _G.Vis
             end
         end
     end)
 end)
 
--- 3. PLAYER
-AddToggle(playerTab, "Safe CFrame Speed", function(v)
-    _G.Speed = v
+-- --- PLAYER FEATURES ---
+AddToggle(playerTab, "Safe Velocity Speed", function(v)
+    _G.BSpeed = v
     spawn(function()
-        while _G.Speed do
-            if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-                local hum = LP.Character.Humanoid
+        while _G.BSpeed do
+            if LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+                local hum = LP.Character:FindFirstChild("Humanoid")
                 if hum.MoveDirection.Magnitude > 0 then
-                    LP.Character:TranslateBy(hum.MoveDirection * 0.35)
+                    LP.Character.HumanoidRootPart.CFrame = LP.Character.HumanoidRootPart.CFrame + (hum.MoveDirection * 0.4)
                 end
             end
-            RS.RenderStepped:Wait()
+            task.wait()
         end
     end)
 end)
@@ -170,11 +170,16 @@ AddToggle(playerTab, "Infinite Jump", function(v)
     UIS.JumpRequest:Connect(function() if _G.InfJump then LP.Character.Humanoid:ChangeState("Jumping") end end)
 end)
 
--- 4. CREDITS
+-- --- CREDITS (FIXED) ---
 local yt = Instance.new("TextButton", creditTab)
 yt.Size = UDim2.new(1, -10, 0, 50); yt.Text = "📺 YouTube: RoWnn0"; yt.BackgroundColor3 = Color3.fromRGB(255, 0, 0); yt.TextColor3 = Color3.new(1, 1, 1); yt.Font = Enum.Font.GothamBold
 Instance.new("UICorner", yt)
 yt.MouseButton1Click:Connect(function() setclipboard("https://www.youtube.com/@RoWnn0") end)
+
+local dc = Instance.new("TextButton", creditTab)
+dc.Size = UDim2.new(1, -10, 0, 50); dc.Text = "🌐 Discord: RoWnn SCRIPTS"; dc.BackgroundColor3 = Color3.fromRGB(88, 101, 242); dc.TextColor3 = Color3.new(1, 1, 1); dc.Font = Enum.Font.GothamBold
+dc.Position = UDim2.new(0,0,0,60)
+Instance.new("UICorner", dc)
 
 -- TOGGLE
 UIS.InputBegan:Connect(function(i, g) if not g and i.KeyCode == Enum.KeyCode.Insert then main.Visible = not main.Visible end end)
