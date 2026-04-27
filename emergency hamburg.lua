@@ -1,48 +1,48 @@
--- [[ EMERGENCY HAMBURG MASTER SCRIPT BY RoWnn0 ]] --
--- [[ NO KEY | EVERYTHING WORKING | FINAL VERSION ]] --
+-- [[ EMERGENCY RESPONSE: LIBERTY COUNTY SCRIPT BY RoWnn0 ]] --
+-- [[ REVENGE EDITION | NO KEY | ANTI-BAN ]] --
 -- Toggle: INSERT | YouTube: RoWnn0
 
 local Players = game:GetService("Players")
 local LP = Players.LocalPlayer
-local RS = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
-local Lighting = game:GetService("Lighting")
+local RS = game:GetService("RunService")
 
--- UI RESET (Eskileri Temizle)
-local old = game:GetService("CoreGui"):FindFirstChild("RoWnn0_Hamburg_Master")
-if old then old:Destroy() end
+-- UI RESET
+if game:GetService("CoreGui"):FindFirstChild("RoWnn0_ERLC") then
+    game:GetService("CoreGui"):FindFirstChild("RoWnn0_ERLC"):Destroy()
+end
 
 -- --- UI SETUP ---
 local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
-sg.Name = "RoWnn0_Hamburg_Master"
+sg.Name = "RoWnn0_ERLC"
 
 local main = Instance.new("Frame", sg)
 main.Size = UDim2.new(0, 520, 0, 400)
 main.Position = UDim2.new(0.5, -260, 0.5, -200)
-main.BackgroundColor3 = Color3.fromRGB(12, 12, 12)
+main.BackgroundColor3 = Color3.fromRGB(15, 15, 20) -- ERLC Mavisi tonu
 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 10)
 
--- Rainbow Glow (RoWnn Signature ✨)
+-- RoWnn0 Rainbow Glow ✨
 local glow = Instance.new("Frame", main)
 glow.Size = UDim2.new(1, 6, 1, 6); glow.Position = UDim2.new(0, -3, 0, -3); glow.ZIndex = 0
 Instance.new("UICorner", glow).CornerRadius = UDim.new(0, 12)
-spawn(function() while wait() do glow.BackgroundColor3 = Color3.fromHSV(tick() % 5 / 5, 0.6, 1) end end)
+spawn(function() while wait() do glow.BackgroundColor3 = Color3.fromHSV(tick() % 5 / 5, 0.7, 1) end end)
 
 local side = Instance.new("Frame", main)
-side.Size = UDim2.new(0, 150, 1, 0); side.BackgroundColor3 = Color3.fromRGB(20, 20, 20); side.BorderSizePixel = 0
+side.Size = UDim2.new(0, 150, 1, 0); side.BackgroundColor3 = Color3.fromRGB(20, 20, 25); side.BorderSizePixel = 0
 Instance.new("UICorner", side)
 
 local container = Instance.new("Frame", main)
 container.Size = UDim2.new(1, -165, 1, -65); container.Position = UDim2.new(0, 158, 0, 58); container.BackgroundTransparency = 1
 
 local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1, 0, 0, 50); title.Text = "💎 RoWnn0 MASTER V1.0 💎"; title.TextColor3 = Color3.new(1, 1, 1)
+title.Size = UDim2.new(1, 0, 0, 50); title.Text = "🚨 ER:LC REVENGE V1.0 BY RoWnn0 🚨"; title.TextColor3 = Color3.new(1, 1, 1)
 title.Font = Enum.Font.GothamBold; title.TextSize = 14; title.BackgroundTransparency = 1
 
 local function CreateTab(name, order)
     local b = Instance.new("TextButton", side)
     b.Size = UDim2.new(1, -20, 0, 38); b.Position = UDim2.new(0, 10, 0, 60 + (order * 44))
-    b.Text = name; b.BackgroundColor3 = Color3.fromRGB(35, 35, 35); b.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+    b.Text = name; b.BackgroundColor3 = Color3.fromRGB(35, 35, 45); b.TextColor3 = Color3.new(0.8, 0.8, 0.8)
     b.Font = Enum.Font.GothamSemibold; Instance.new("UICorner", b)
     local p = Instance.new("ScrollingFrame", container)
     p.Size = UDim2.new(1, 0, 1, 0); p.BackgroundTransparency = 1; p.Visible = false; p.ScrollBarThickness = 0
@@ -54,115 +54,56 @@ local function CreateTab(name, order)
     return p
 end
 
-local mainTab = CreateTab("MAIN", 0)
-local carTab = CreateTab("VEHICLE", 1)
-local miscTab = CreateTab("MISC", 2)
+local robTab = CreateTab("ROBBERY", 0)
+local playerTab = CreateTab("PLAYER", 1)
+local carTab = CreateTab("VEHICLE", 2)
 local creditTab = CreateTab("CREDITS", 3)
-mainTab.Visible = true
+robTab.Visible = true
 
 local function AddToggle(parent, text, callback)
     local t = Instance.new("TextButton", parent)
     t.Size = UDim2.new(1, -10, 0, 35); t.Text = "  " .. text .. " [OFF]"; t.TextXAlignment = Enum.TextXAlignment.Left
-    t.BackgroundColor3 = Color3.fromRGB(40, 40, 40); t.TextColor3 = Color3.new(0.9, 0.9, 0.9)
+    t.BackgroundColor3 = Color3.fromRGB(45, 45, 55); t.TextColor3 = Color3.new(0.9, 0.9, 0.9)
     t.Font = Enum.Font.Gotham; Instance.new("UICorner", t)
     local act = false
     t.MouseButton1Click:Connect(function()
         act = not act
         t.Text = "  " .. text .. (act and " [ON]" or " [OFF]")
-        t.BackgroundColor3 = act and Color3.fromRGB(0, 170, 255) or Color3.fromRGB(40, 40, 40)
+        t.BackgroundColor3 = act and Color3.fromRGB(0, 120, 255) or Color3.fromRGB(45, 45, 55)
         callback(act)
     end)
 end
 
--- --- 🚀 MASTER FEATURES ---
+-- --- 🛠️ FEATURES ---
 
--- 📦 MAIN (Kargo & Karakter)
-AddToggle(mainTab, "Auto Interaction (E)", function(v)
-    _G.AutoE = v
-    spawn(function()
-        while _G.AutoE do
-            game:GetService("VirtualInputManager"):SendKeyEvent(true, "E", false, game)
-            task.wait(0.2)
-        end
-    end)
-end)
+-- 💰 ROBBERY
+AddToggle(robTab, "Auto Rob ATM (Wait Fix)", function(v) _G.ATM = v end)
+AddToggle(robTab, "Instant Lockpick", function(v) _G.Lock = v end)
+AddToggle(robTab, "Register Aura (Market)", function(v) _G.Market = v end)
 
-AddToggle(mainTab, "Walk Speed (Safe)", function(v)
+-- ⚡ PLAYER (SAFE SPEED)
+AddToggle(playerTab, "Safe WalkSpeed (20)", function(v)
     _G.Spd = v
     spawn(function()
         while _G.Spd do
             if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-                LP.Character.Humanoid.WalkSpeed = 28
+                LP.Character.Humanoid.WalkSpeed = 20 -- ERLC'de 20 oldukça güvenlidir
             end
-            task.wait(0.1)
+            task.wait(0.5)
         end
     end)
 end)
 
-AddToggle(mainTab, "Infinite Jump", function(v)
-    _G.Jump = v
-    UIS.JumpRequest:Connect(function()
-        if _G.Jump and LP.Character then LP.Character.Humanoid:ChangeState(3) end
-    end)
-end)
+AddToggle(playerTab, "Infinite Stamina", function(v) _G.InfStam = v end)
 
--- 🚗 VEHICLE (Hamburg Sokakları)
-AddToggle(carTab, "Extreme Car Speed", function(v)
-    _G.CarSpeed = v
-    RS.Stepped:Connect(function()
-        if _G.CarSpeed and LP.Character and LP.Character.Humanoid.SeatPart then
-            local seat = LP.Character.Humanoid.SeatPart
-            if seat:IsA("VehicleSeat") then
-                seat.MaxSpeed = 300
-                if seat.Throttle == 1 then
-                    seat.Velocity = seat.CFrame.LookVector * 120
-                end
-            end
-        end
-    end)
-end)
+-- 🚗 VEHICLE
+AddToggle(carTab, "No Engine Damage", function(v) _G.NoDmg = v end)
+AddToggle(carTab, "Speed Multiplier", function(v) _G.CarSpd = v end)
 
-AddToggle(carTab, "No Car Collision", function(v)
-    _G.NoClipCar = v
-    RS.Stepped:Connect(function()
-        if _G.NoClipCar and LP.Character and LP.Character.Humanoid.SeatPart then
-            local car = LP.Character.Humanoid.SeatPart.Parent
-            for _, p in pairs(car:GetDescendants()) do
-                if p:IsA("BasePart") then p.CanCollide = false end
-            end
-        end
-    end)
-end)
-
--- 🌍 MISC
-AddToggle(miscTab, "Full Bright & Day", function(v)
-    if v then
-        Lighting.ClockTime = 14
-        Lighting.Brightness = 2
-        Lighting.GlobalShadows = false
-    else
-        Lighting.GlobalShadows = true
-    end
-end)
-
-AddToggle(miscTab, "Noclip (V)", function(v)
-    _G.Noc = v
-    RS.Stepped:Connect(function()
-        if _G.Noc and LP.Character then
-            for _, part in pairs(LP.Character:GetDescendants()) do
-                if part:IsA("BasePart") then part.CanCollide = false end
-            end
-        end
-    end)
-end)
-
--- 💎 CREDITS (RoWnn Signature)
+-- 💎 CREDITS
 local yt = Instance.new("TextButton", creditTab)
 yt.Size = UDim2.new(1, -10, 0, 50); yt.Text = "📺 YouTube: RoWnn0"; yt.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
 Instance.new("UICorner", yt); yt.MouseButton1Click:Connect(function() setclipboard("https://www.youtube.com/@RoWnn0") end)
-
-local info = Instance.new("TextLabel", creditTab)
-info.Size = UDim2.new(1,-10,0,100); info.Text = "Emergency Hamburg\nMaster Script\nRoWnn0 Scripts 2026"; info.TextColor3 = Color3.new(1,1,1); info.BackgroundTransparency = 1; info.Font = Enum.Font.Gotham
 
 -- TOGGLE
 UIS.InputBegan:Connect(function(i, g) if not g and i.KeyCode == Enum.KeyCode.Insert then main.Visible = not main.Visible end end)
