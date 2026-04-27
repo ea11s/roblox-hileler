@@ -1,7 +1,6 @@
--- [[ ER:LC MASTER V4.5 BY RoWnn0 ]] --
--- [[ SPEED + JUMP + FOV + TURBO + INF AMMO ]] --
+-- [[ ER:LC ULTIMATE MASTER V5.0 BY RoWnn0 ]] --
+-- [[ SPEED FIX + NO FALL + Q DASH + SMART CAR ]] --
 
--- TEMİZLİK PROTOKOLÜ
 for _, v in pairs(game:GetService("CoreGui"):GetChildren()) do
     if v.Name:find("RoWnn0") then v:Destroy() end
 end
@@ -12,143 +11,135 @@ local RS = game:GetService("RunService")
 local UIS = game:GetService("UserInputService")
 local Mouse = LP:GetMouse()
 
--- --- AYARLAR ---
-_G.WalkSpeed = 16
+-- --- SETTINGS ---
+_G.SpeedEnabled = false
+_G.SpeedValue = 0.5
 _G.InfJump = false
-_G.SilentAim = false
-_G.FOVSize = 100
-_G.CarSpeed = 0
-_G.InfAmmo = false -- YENİ!
+_G.NoFall = false
+_G.DashDistance = 25
+_G.CarTurbo = 0
 
--- FOV GÖRSELİ
-local FOVCircle = Drawing.new("Circle")
-FOVCircle.Thickness = 2
-FOVCircle.Color = Color3.fromRGB(0, 255, 255)
-FOVCircle.Visible = false
-
--- --- UI SETUP (MODERN DARK) ---
+-- --- UI SETUP ---
 local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
-sg.Name = "RoWnn0_Ultimate_V45"
+sg.Name = "RoWnn0_V5_Final"
 
 local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 550, 0, 520) -- Biraz daha büyüttüm
-main.Position = UDim2.new(0.5, -275, 0.5, -260)
-main.BackgroundColor3 = Color3.fromRGB(12, 12, 17)
+main.Size = UDim2.new(0, 500, 0, 500)
+main.Position = UDim2.new(0.5, -250, 0.5, -250)
+main.BackgroundColor3 = Color3.fromRGB(10, 10, 10)
 Instance.new("UICorner", main).CornerRadius = UDim.new(0, 15)
 
--- RoWnn Rainbow Glow ✨
+-- Neon Border
 local glow = Instance.new("Frame", main)
-glow.Size = UDim2.new(1, 6, 1, 6); glow.Position = UDim2.new(0, -3, 0, -3); glow.ZIndex = 0
+glow.Size = UDim2.new(1, 4, 1, 4); glow.Position = UDim2.new(0, -2, 0, -2); glow.ZIndex = 0
 Instance.new("UICorner", glow).CornerRadius = UDim.new(0, 16)
 spawn(function() while wait() do glow.BackgroundColor3 = Color3.fromHSV(tick() % 5 / 5, 0.7, 1) end end)
 
-local container = Instance.new("ScrollingFrame", main)
-container.Size = UDim2.new(1, -20, 1, -100); container.Position = UDim2.new(0, 10, 0, 60)
-container.BackgroundTransparency = 1; container.ScrollBarThickness = 3
-Instance.new("UIListLayout", container).Padding = UDim.new(0, 10)
-
 local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1, 0, 0, 50); title.Text = "🔥 RoWnn0 MASTER V4.5 - THE GOD MODE 🔥"
-title.TextColor3 = Color3.new(1, 1, 1); title.Font = Enum.Font.GothamBold; title.TextSize = 16; title.BackgroundTransparency = 1
+title.Size = UDim2.new(1, 0, 0, 60); title.Text = "🚀 RoWnn0 V5.0: THE UNSTOPPABLE 🚀"
+title.TextColor3 = Color3.new(1, 1, 1); title.Font = Enum.Font.GothamBold; title.BackgroundTransparency = 1
 
--- --- BİLEŞENLER ---
+local container = Instance.new("ScrollingFrame", main)
+container.Size = UDim2.new(1, -20, 1, -80); container.Position = UDim2.new(0, 10, 0, 70)
+container.BackgroundTransparency = 1; container.ScrollBarThickness = 0
+Instance.new("UIListLayout", container).Padding = UDim.new(0, 8)
+
 local function AddToggle(text, callback)
     local b = Instance.new("TextButton", container)
-    b.Size = UDim2.new(1, -10, 0, 40); b.Text = "  " .. text .. " [KAPALI]"; b.TextXAlignment = Enum.TextXAlignment.Left
-    b.BackgroundColor3 = Color3.fromRGB(30, 30, 40); b.TextColor3 = Color3.new(0.8, 0.8, 0.8)
+    b.Size = UDim2.new(1, 0, 0, 40); b.Text = text .. " [KAPALI]"
+    b.BackgroundColor3 = Color3.fromRGB(25, 25, 25); b.TextColor3 = Color3.new(1,1,1)
     b.Font = Enum.Font.GothamSemibold; Instance.new("UICorner", b)
     local act = false
     b.MouseButton1Click:Connect(function()
         act = not act
-        b.Text = "  " .. text .. (act and " [AÇIK]" or " [KAPALI]")
-        b.BackgroundColor3 = act and Color3.fromRGB(0, 120, 255) or Color3.fromRGB(30, 30, 40)
+        b.Text = text .. (act and " [AÇIK]" or " [KAPALI]")
+        b.BackgroundColor3 = act and Color3.fromRGB(0, 150, 255) or Color3.fromRGB(25, 25, 25)
         callback(act)
     end)
 end
 
 local function AddSlider(text, min, max, callback)
-    local f = Instance.new("Frame", container)
-    f.Size = UDim2.new(1, -10, 0, 55); f.BackgroundTransparency = 1
-    local l = Instance.new("TextLabel", f)
-    l.Size = UDim2.new(1, 0, 0, 20); l.Text = "  " .. text .. ": " .. min; l.TextColor3 = Color3.new(1,1,1); l.BackgroundTransparency = 1; l.TextXAlignment = Enum.TextXAlignment.Left
-    local b = Instance.new("TextButton", f)
-    b.Size = UDim2.new(1, 0, 0, 25); b.Position = UDim2.new(0,0,0,25); b.Text = "DEĞERİ DEĞİŞTİR (+)"; b.BackgroundColor3 = Color3.fromRGB(50,50,70)
-    b.TextColor3 = Color3.new(1,1,1); Instance.new("UICorner", b)
+    local b = Instance.new("TextButton", container)
+    b.Size = UDim2.new(1, 0, 0, 40); b.Text = text .. " Ayarı (+)"
+    b.BackgroundColor3 = Color3.fromRGB(40, 40, 40); b.TextColor3 = Color3.new(1,1,1)
+    b.Font = Enum.Font.Gotham; Instance.new("UICorner", b)
     local val = min
     b.MouseButton1Click:Connect(function()
-        val = val + ((max-min)/10)
+        val = val + ((max-min)/5)
         if val > max then val = min end
-        l.Text = "  " .. text .. ": " .. math.floor(val)
+        b.Text = text .. ": " .. math.floor(val)
         callback(val)
     end)
 end
 
--- --- ⚙️ MASTER ÖZELLİKLER ---
+-- --- 🛠️ FEATURES ---
 
--- COMBAT
-AddToggle("Sınırsız Mermi (Instant Reload)", function(v) _G.InfAmmo = v end)
-AddToggle("Silent Aim (FOV)", function(v) _G.SilentAim = v; FOVCircle.Visible = v end)
-AddSlider("FOV Boyutu", 50, 600, function(v) _G.FOVSize = v end)
+AddToggle("Bypass WalkSpeed (Velocity)", function(v) _G.SpeedEnabled = v end)
+AddSlider("Hız Seviyesi", 0, 5, function(v) _G.SpeedValue = v/10 end)
 
--- PLAYER
-AddSlider("Yürüme Hızı", 16, 120, function(v) _G.WalkSpeed = v end)
+AddToggle("No Fall Damage (Düşme Hasarı)", function(v) _G.NoFall = v end)
 AddToggle("Sınırsız Zıplama", function(v) _G.InfJump = v end)
 
--- VEHICLE
-AddSlider("Araba Hız Boost", 0, 500, function(v) _G.CarSpeed = v end)
+AddToggle("Q Dash (Atılma)", function(v) _G.DashEnabled = v end)
+AddSlider("Dash Mesafesi", 10, 50, function(v) _G.DashDistance = v end)
 
--- --- 🚀 MOTOR (ENGINE) ---
+AddSlider("Araba Turbo", 0, 400, function(v) _G.CarTurbo = v end)
 
--- Ammo Logic (ER:LC Silahları için Hook)
-spawn(function()
-    while task.wait(0.1) do
-        if _G.InfAmmo then
-            -- Mermi bitince beklemeden şarjörü fulleme simülasyonu
-            pcall(function()
-                local tool = LP.Character:FindFirstChildOfClass("Tool")
-                if tool and tool:FindFirstChild("Ammo") then
-                    tool.Ammo.Value = 999
-                end
-            end)
+-- --- ⚙️ ENGINE ---
+
+-- 1. BYPASS SPEED (Velocity tabanlı - Anticheat yakalayamaz)
+RS.Heartbeat:Connect(function()
+    if _G.SpeedEnabled and LP.Character and LP.Character:FindFirstChild("HumanoidRootPart") then
+        local hum = LP.Character:FindFirstChild("Humanoid")
+        if hum.MoveDirection.Magnitude > 0 then
+            LP.Character.HumanoidRootPart.CFrame = LP.Character.HumanoidRootPart.CFrame + (hum.MoveDirection * _G.SpeedValue)
         end
     end
 end)
 
--- Physics Logic
-RS.PreSimulation:Connect(function()
-    if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid.WalkSpeed = _G.WalkSpeed
+-- 2. NO FALL DAMAGE
+spawn(function()
+    while wait() do
+        if _G.NoFall and LP.Character and LP.Character:FindFirstChild("Humanoid") then
+            if LP.Character.Humanoid:GetState() == Enum.HumanoidStateType.FallingDown then
+                LP.Character.HumanoidRootPart.Velocity = Vector3.new(0, 0, 0)
+            end
+        end
     end
 end)
 
+-- 3. Q DASH
+UIS.InputBegan:Connect(function(i, g)
+    if not g and i.KeyCode == Enum.KeyCode.Q and _G.DashEnabled then
+        local hrp = LP.Character:FindFirstChild("HumanoidRootPart")
+        local hum = LP.Character:FindFirstChild("Humanoid")
+        if hrp and hum then
+            hrp.CFrame = hrp.CFrame + (hum.MoveDirection * _G.DashDistance)
+        end
+    end
+end)
+
+-- 4. SMART CAR TURBO (Fren Yapınca Durur)
+RS.RenderStepped:Connect(function()
+    if _G.CarTurbo > 0 and LP.Character and LP.Character.Humanoid.SeatPart then
+        local seat = LP.Character.Humanoid.SeatPart
+        if seat:IsA("VehicleSeat") then
+            seat.MaxSpeed = _G.CarTurbo
+            if seat.Throttle == 1 then -- Sadece gaza basınca hızlanır
+                seat.Velocity = seat.CFrame.LookVector * (_G.CarTurbo * 0.6)
+            elseif seat.Throttle == -1 then -- Geri vites/fren yapınca hızı keser
+                seat.Velocity = seat.CFrame.LookVector * -50
+            end
+        end
+    end
+end)
+
+-- 5. INF JUMP
 UIS.JumpRequest:Connect(function()
-    if _G.InfJump and LP.Character and LP.Character:FindFirstChild("Humanoid") then
+    if _G.InfJump and LP.Character:FindFirstChild("Humanoid") then
         LP.Character.Humanoid:ChangeState(3)
     end
 end)
 
--- Car Logic
-RS.Heartbeat:Connect(function()
-    if _G.CarSpeed > 0 and LP.Character and LP.Character.Humanoid.SeatPart then
-        local seat = LP.Character.Humanoid.SeatPart
-        if seat:IsA("VehicleSeat") then
-            seat.MaxSpeed = _G.CarSpeed
-            seat.Velocity = seat.CFrame.LookVector * (_G.CarSpeed * 0.7)
-        end
-    end
-end)
-
--- FOV Logic
-RS.RenderStepped:Connect(function()
-    FOVCircle.Position = Vector2.new(Mouse.X, Mouse.Y + 36)
-    FOVCircle.Radius = _G.FOVSize
-end)
-
--- TOGGLE & FOOTER
+-- TOGGLE
 UIS.InputBegan:Connect(function(i, g) if not g and i.KeyCode == Enum.KeyCode.Insert then main.Visible = not main.Visible end end)
-
-local footer = Instance.new("TextButton", main)
-footer.Size = UDim2.new(1, -20, 0, 35); footer.Position = UDim2.new(0, 10, 1, -45)
-footer.Text = "KOPYALA: YouTube @RoWnn0"; footer.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
-footer.TextColor3 = Color3.new(1, 1, 1); footer.Font = Enum.Font.GothamBold; Instance.new("UICorner", footer)
-footer.MouseButton1Click:Connect(function() setclipboard("https://www.youtube.com/@RoWnn0") end)
