@@ -1,5 +1,5 @@
--- [[ ER:LC PURE HUNTER V9.0 BY RoWnn0 ]] --
--- [[ TRACERS + GLOW ESP + Q DASH + AIMBOT ]] --
+-- [[ ER:LC CLEAN GHOST V9.5 BY RoWnn0 ]] --
+-- [[ ONLY GLOW ESP + TRACERS + Q DASH ]] --
 
 for _, v in pairs(game:GetService("CoreGui"):GetChildren()) do
     if v.Name:find("RoWnn0") then v:Destroy() end
@@ -27,14 +27,14 @@ FOVCircle.Thickness = 2; FOVCircle.Color = Color3.new(1, 0, 0); FOVCircle.Visibl
 
 -- --- UI SETUP ---
 local sg = Instance.new("ScreenGui", game:GetService("CoreGui"))
-sg.Name = "RoWnn0_Hunter_V9"
+sg.Name = "RoWnn0_Ghost_V95"
 
 local main = Instance.new("Frame", sg)
 main.Size = UDim2.new(0, 500, 0, 380); main.Position = UDim2.new(0.5, -250, 0.5, -190)
 main.BackgroundColor3 = Color3.fromRGB(10, 10, 12); main.BorderSizePixel = 0
 Instance.new("UICorner", main)
 
--- Neon Glow
+-- Neon Glow Border
 local glowBorder = Instance.new("Frame", main)
 glowBorder.Size = UDim2.new(1, 4, 1, 4); glowBorder.Position = UDim2.new(0, -2, 0, -2); glowBorder.ZIndex = 0
 Instance.new("UICorner", glowBorder)
@@ -79,13 +79,11 @@ local function AddToggle(parent, text, callback)
     end)
 end
 
--- --- ⚙️ ENGINE ---
+-- --- ⚙️ MOTORLAR ---
 
--- Aimbot & Movement
 RS.RenderStepped:Connect(function()
     FOVCircle.Position = Vector2.new(Mouse.X, Mouse.Y + 36); FOVCircle.Radius = _G.FOVSize
     
-    -- Aimbot (Sağ Tık)
     if _G.Aimbot and UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
         local target = nil; local dist = _G.FOVSize
         for _, p in pairs(Players:GetPlayers()) do
@@ -98,7 +96,6 @@ RS.RenderStepped:Connect(function()
         if target then Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Character.Head.Position) end
     end
 
-    -- Speed Bypass
     if _G.SpeedEnabled and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         if LP.Character.Humanoid.MoveDirection.Magnitude > 0 then
             LP.Character.HumanoidRootPart.CFrame = LP.Character.HumanoidRootPart.CFrame + (LP.Character.Humanoid.MoveDirection * _G.SpeedValue)
@@ -106,21 +103,17 @@ RS.RenderStepped:Connect(function()
     end
 end)
 
--- Visuals (Tracers & Glow ESP)
 local function ApplyVisuals(p)
     local line = Drawing.new("Line")
     RS.RenderStepped:Connect(function()
         if p.Character and p.Character:FindFirstChild("HumanoidRootPart") and p ~= LP then
             local pos, vis = Camera:WorldToViewportPoint(p.Character.HumanoidRootPart.Position)
-            
-            -- Tracers
             line.Visible = _G.Tracers and vis
             if line.Visible then
                 line.From = Vector2.new(Camera.ViewportSize.X/2, Camera.ViewportSize.Y); line.To = Vector2.new(pos.X, pos.Y)
                 line.Color = (p.Team and p.Team.Name:find("Pol")) and Color3.new(1,0,0) or Color3.new(1,1,1)
             end
 
-            -- Glow ESP (Highlight)
             local hl = p.Character:FindFirstChild("RoWnnGlow")
             if _G.GlowESP then
                 if not hl then
@@ -136,23 +129,20 @@ end
 for _, p in pairs(Players:GetPlayers()) do ApplyVisuals(p) end
 Players.PlayerAdded:Connect(ApplyVisuals)
 
--- --- FEATURES ---
+-- --- BUTONLAR ---
 AddToggle(aimTab, "Aimbot (Sağ Tık)", function(v) _G.Aimbot = v; FOVCircle.Visible = v end)
-
 AddToggle(espTab, "Tracers (Çizgiler)", function(v) _G.Tracers = v end)
 AddToggle(espTab, "Glow ESP (Parlama)", function(v) _G.GlowESP = v end)
-
-AddToggle(miscTab, "Q Dash (Hızlı Atılma)", function(v) _G.DashEnabled = v end)
+AddToggle(miscTab, "Q Dash (Atılma)", function(v) _G.DashEnabled = v end)
 AddToggle(miscTab, "Safe Speed", function(v) _G.SpeedEnabled = v end)
 AddToggle(miscTab, "Infinite Jump", function(v) _G.InfJump = v end)
 
--- Social
 local yt = Instance.new("TextButton", credTab)
-yt.Size = UDim2.new(1, -10, 0, 45); yt.Text = "ABONE OL: RoWnn0"; yt.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
+yt.Size = UDim2.new(1, -10, 0, 45); yt.Text = "YouTube: RoWnn0"; yt.BackgroundColor3 = Color3.fromRGB(200, 0, 0)
 yt.TextColor3 = Color3.new(1, 1, 1); yt.Font = Enum.Font.GothamBold; Instance.new("UICorner", yt)
 yt.MouseButton1Click:Connect(function() setclipboard("https://www.youtube.com/@RoWnn0") end)
 
--- Keybinds
+-- --- KEYBINDS ---
 UIS.InputBegan:Connect(function(i, g)
     if not g and i.KeyCode == Enum.KeyCode.Q and _G.DashEnabled then
         LP.Character.HumanoidRootPart.CFrame = LP.Character.HumanoidRootPart.CFrame + (LP.Character.Humanoid.MoveDirection * 35)
