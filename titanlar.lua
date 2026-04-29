@@ -1,121 +1,156 @@
--- [[ RoWnn0 STEEL TITANS V8.0 - FORCED UI ]] --
--- Menü gelmezse diye her şey en güvenli yere (PlayerGui) kuruldu.
+-- [[ RoWnn0 STEEL TITANS - İLK ÇALIŞAN SİSTEMİN V2'Sİ ]] --
 
-local Players = game:GetService("Players")
-local LP = Players.LocalPlayer
-local RS = game:GetService("RunService")
+local LP = game:GetService("Players").LocalPlayer
 local UIS = game:GetService("UserInputService")
+local RS = game:GetService("RunService")
 local Camera = workspace.CurrentCamera
-local Mouse = LP:GetMouse()
 
--- Eski her şeyi temizle
-for _, v in pairs(LP.PlayerGui:GetChildren()) do if v.Name == "RoWnn0_Titan_V8" then v:Destroy() end end
+-- Ekranda eski ne varsa temizle
+for _, v in pairs(game:GetService("CoreGui"):GetChildren()) do
+    if v.Name == "TitanMenu" then v:Destroy() end
+end
 
--- --- AYARLAR ---
-_G.Aimbot = false
-_G.Fly = false
-_G.Glow = false
-_G.Tracers = false
-_G.FlySpeed = 60
-_G.TankSpeed = false
+-- --- ANA MENÜ OLUŞTURMA (EN BASİT YÖNTEM) ---
+local ScreenGui = Instance.new("ScreenGui", game:GetService("CoreGui"))
+ScreenGui.Name = "TitanMenu"
 
--- --- UI START ---
-local sg = Instance.new("ScreenGui", LP.PlayerGui)
-sg.Name = "RoWnn0_Titan_V8"
-sg.ResetOnSpawn = false
+local MainFrame = Instance.new("Frame", ScreenGui)
+MainFrame.Size = UDim2.new(0, 250, 0, 350)
+MainFrame.Position = UDim2.new(0, 50, 0.5, -175)
+MainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+MainFrame.Active = true
+MainFrame.Draggable = true -- Menüyü farenle taşıyabilirsin
 
-local main = Instance.new("Frame", sg)
-main.Size = UDim2.new(0, 400, 0, 300); main.Position = UDim2.new(0.5, -200, 0.5, -150)
-main.BackgroundColor3 = Color3.fromRGB(20, 20, 25); main.Active = true; main.Draggable = true
-Instance.new("UICorner", main)
+local Title = Instance.new("TextLabel", MainFrame)
+Title.Size = UDim2.new(1, 0, 0, 40)
+Title.Text = "RoWnn0 TITAN HACK"
+Title.BackgroundColor3 = Color3.fromRGB(50, 0, 0)
+Title.TextColor3 = Color3.new(1, 1, 1)
+Title.Font = Enum.Font.SourceSansBold
+Title.TextSize = 20
 
-local title = Instance.new("TextLabel", main)
-title.Size = UDim2.new(1, 0, 0, 35); title.Text = "RoWnn0 V8.0 - INSERT"; title.TextColor3 = Color3.new(1,1,1)
-title.BackgroundColor3 = Color3.fromRGB(30, 30, 40); title.Font = Enum.Font.GothamBold
-
-local container = Instance.new("ScrollingFrame", main)
-container.Size = UDim2.new(1, -20, 1, -50); container.Position = UDim2.new(0, 10, 0, 40)
-container.BackgroundTransparency = 1; container.ScrollBarThickness = 0
-local list = Instance.new("UIListLayout", container); list.Padding = UDim.new(0, 5)
-
-local function AddToggle(name, callback)
-    local b = Instance.new("TextButton", container)
-    b.Size = UDim2.new(1, 0, 0, 35); b.Text = name .. " [OFF]"; b.BackgroundColor3 = Color3.fromRGB(40, 40, 50)
-    b.TextColor3 = Color3.new(1,1,1); b.Font = Enum.Font.Gotham; Instance.new("UICorner", b)
-    local state = false
-    b.MouseButton1Click:Connect(function()
-        state = not state; b.Text = name .. (state and " [ON]" or " [OFF]")
-        b.BackgroundColor3 = state and Color3.fromRGB(0, 180, 100) or Color3.fromRGB(40, 40, 50)
-        callback(state)
+-- --- BUTON OLUŞTURUCU ---
+local function CreateBtn(name, pos, callback)
+    local btn = Instance.new("TextButton", MainFrame)
+    btn.Size = UDim2.new(0.9, 0, 0, 40)
+    btn.Position = UDim2.new(0.05, 0, 0, pos)
+    btn.Text = name .. " [KAPALI]"
+    btn.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+    btn.TextColor3 = Color3.new(1, 1, 1)
+    btn.Font = Enum.Font.SourceSans
+    btn.TextSize = 16
+    
+    local enabled = false
+    btn.MouseButton1Click:Connect(function()
+        enabled = not enabled
+        btn.Text = name .. (enabled and " [AÇIK]" or " [KAPALI]")
+        btn.BackgroundColor3 = enabled and Color3.fromRGB(0, 120, 0) or Color3.fromRGB(45, 45, 45)
+        callback(enabled)
     end)
 end
 
 -- --- ÖZELLİKLER ---
 
--- FLY (E Tuşu)
-local bv = Instance.new("BodyVelocity"); local bg = Instance.new("BodyGyro")
-bv.MaxForce = Vector3.new(1e9, 1e9, 1e9); bg.MaxTorque = Vector3.new(1e9, 1e9, 1e9)
+-- 1. Fly (Uçma)
+local flying = false
+local speed = 60
+CreateBtn("Tank/Oyuncu Fly (E)", function(state)
+    flying = state
+end)
 
 RS.RenderStepped:Connect(function()
-    if _G.Fly then
-        local t = (LP.Character and LP.Character:FindFirstChild("Humanoid") and LP.Character.Humanoid.SeatPart) or (LP.Character and LP.Character:FindFirstChild("HumanoidRootPart"))
-        if t then
-            bv.Parent = t; bg.Parent = t; bg.CFrame = Camera.CFrame
-            local d = Vector3.new(0,0,0)
-            if UIS:IsKeyDown("W") then d = d + Camera.CFrame.LookVector end
-            if UIS:IsKeyDown("S") then d = d - Camera.CFrame.LookVector end
-            if UIS:IsKeyDown("A") then d = d - Camera.CFrame.RightVector end
-            if UIS:IsKeyDown("D") then d = d + Camera.CFrame.RightVector end
-            bv.Velocity = d * _G.FlySpeed
+    if flying then
+        local target = (LP.Character and LP.Character:FindFirstChild("Humanoid") and LP.Character.Humanoid.SeatPart) or (LP.Character and LP.Character:FindFirstChild("HumanoidRootPart"))
+        if target then
+            local moveDir = Vector3.new(0,0,0)
+            if UIS:IsKeyDown(Enum.KeyCode.W) then moveDir = moveDir + Camera.CFrame.LookVector end
+            if UIS:IsKeyDown(Enum.KeyCode.S) then moveDir = moveDir - Camera.CFrame.LookVector end
+            if UIS:IsKeyDown(Enum.KeyCode.A) then moveDir = moveDir - Camera.CFrame.RightVector end
+            if UIS:IsKeyDown(Enum.KeyCode.D) then moveDir = moveDir + Camera.CFrame.RightVector end
+            target.Velocity = moveDir * speed
+            -- Yerçekimini yenmek için küçük bir kuvvet
+            if target:IsA("BasePart") then target.Velocity = target.Velocity + Vector3.new(0,1,0) end
         end
-    else
-        bv.Parent = nil; bg.Parent = nil
     end
 end)
 
--- AIMBOT
+-- 2. ESP (Glow)
+local espEnabled = false
+CreateBtn("Glow ESP", function(state)
+    espEnabled = state
+end)
+
 RS.RenderStepped:Connect(function()
-    if _G.Aimbot and UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
-        local target = nil; local dist = 200
-        for _, v in pairs(Players:GetPlayers()) do
-            if v ~= LP and v.Character and v.Character:FindFirstChild("HumanoidRootPart") then
-                local pos, vis = Camera:WorldToViewportPoint(v.Character.HumanoidRootPart.Position)
+    for _, p in pairs(game:GetService("Players"):GetPlayers()) do
+        if p ~= LP and p.Character then
+            local highlight = p.Character:FindFirstChild("Highlight")
+            if espEnabled then
+                if not highlight then
+                    highlight = Instance.new("Highlight", p.Character)
+                end
+                highlight.Enabled = true
+                highlight.FillColor = Color3.new(1, 0, 0)
+            elseif highlight then
+                highlight.Enabled = false
+            end
+        end
+    end
+end)
+
+-- 3. Aimbot
+local aimEnabled = false
+CreateBtn("Aimbot (Sağ Tık)", function(state)
+    aimEnabled = state
+end)
+
+RS.RenderStepped:Connect(function()
+    if aimEnabled and UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
+        local closest = nil
+        local dist = 300
+        for _, p in pairs(game:GetService("Players"):GetPlayers()) do
+            if p ~= LP and p.Character and p.Character:FindFirstChild("HumanoidRootPart") then
+                local pos, vis = Camera:WorldToViewportPoint(p.Character.HumanoidRootPart.Position)
                 if vis then
-                    local m = (Vector2.new(pos.X, pos.Y) - Vector2.new(Mouse.X, Mouse.Y)).Magnitude
-                    if m < dist then target = v; dist = m end
+                    local mag = (Vector2.new(pos.X, pos.Y) - UIS:GetMouseLocation()).Magnitude
+                    if mag < dist then
+                        closest = p.Character.HumanoidRootPart
+                        dist = mag
+                    end
                 end
             end
         end
-        if target then Camera.CFrame = CFrame.new(Camera.CFrame.Position, target.Character.HumanoidRootPart.Position) end
+        if closest then
+            Camera.CFrame = CFrame.new(Camera.CFrame.Position, closest.Position)
+        end
     end
 end)
 
--- ESP & GLOW
-local function ApplyESP(v)
-    RS.RenderStepped:Connect(function()
-        if v.Character and v ~= LP then
-            local h = v.Character:FindFirstChild("GlowV8")
-            if _G.Glow then
-                if not h then h = Instance.new("Highlight", v.Character); h.Name = "GlowV8" end
-                h.Enabled = true; h.FillColor = Color3.new(1,0,0)
-            elseif h then h.Enabled = false end
-        end
-    end)
-end
-for _, v in pairs(Players:GetPlayers()) do ApplyESP(v) end
-Players.PlayerAdded:Connect(ApplyESP)
-
--- --- TOGGLES ---
-AddToggle("Aimbot (Sağ Tık)", function(v) _G.Aimbot = v end)
-AddToggle("Uçma (E)", function(v) _G.Fly = v end)
-AddToggle("Glow ESP", function(v) _G.Glow = v end)
-AddToggle("Süper Tank Hızı", function(v) _G.TankSpeed = v end)
-
--- Keybinds
-UIS.InputBegan:Connect(function(i, g)
-    if g then return end
-    if i.KeyCode == Enum.KeyCode.Insert then main.Visible = not main.Visible end
-    if i.KeyCode == Enum.KeyCode.E then _G.Fly = not _G.Fly end
+-- 4. Tank Hızı
+local tankSpeed = false
+CreateBtn("Hızlı Tank", function(state)
+    tankSpeed = state
 end)
 
-print("RoWnn0 V8.0 AKTIF! Menü gelmezse bile E tuşu uçurur.")
+RS.Heartbeat:Connect(function()
+    if tankSpeed then
+        pcall(function()
+            local seat = LP.Character.Humanoid.SeatPart
+            if seat and seat:IsA("VehicleSeat") then
+                seat.MaxSpeed = 150
+                seat.Torque = 1e6
+            end
+        end)
+    end
+end)
+
+-- Menü Aç/Kapat (INSERT)
+UIS.InputBegan:Connect(function(input, g)
+    if not g and input.KeyCode == Enum.KeyCode.Insert then
+        MainFrame.Visible = not MainFrame.Visible
+    end
+    if not g and input.KeyCode == Enum.KeyCode.E then
+        flying = not flying -- E tuşu uçmayı tetikler
+    end
+end)
+
+print("RoWnn0 Script Yuklendi!")
