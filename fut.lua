@@ -1,4 +1,4 @@
--- [[ ODAKLANMIŞ 5 ÖZELLİKLİ FUTBOL HELPER ]] --
+-- [[ OPTİMİZE EDİLMİŞ 0 KASMA FUTBOL HELPER ]] --
 -- [[ Menü Aç/Kapa: INSERT Tuşu ]] --
 
 local Players = game:GetService("Players")
@@ -14,14 +14,33 @@ if CoreGui:FindFirstChild("FutbolCoreMenu") then
     CoreGui.FutbolCoreMenu:Destroy()
 end
 
--- --- AYAR MATRİSİ ---
 _G.FutCore = {
-    BigBallHitbox = false, -- 1. Top Hitbox Büyütme
-    SprintSpeed   = false, -- 2. Yüksek Depar Hızı
-    BrightMode    = false, -- 3. Saha Aydınlatma (Fullbright)
-    FastDribble   = false, -- 4. Hızlı Dribling & Manevra
-    BoxVisuals    = false  -- 5. Adamlara ve Topa Kutu (Box) Koy
+    BigBallHitbox = false,
+    SprintSpeed   = false,
+    BrightMode    = false,
+    FastDribble   = false,
+    BoxVisuals    = false
 }
+
+-- TOPU YALNIZCA BİR KERE BULMA MOTORU (FPS DÜŞÜŞÜNÜ ÖNLER)
+local cachedBall = nil
+local function GetBall()
+    if cachedBall and cachedBall.Parent then return cachedBall end
+    for _, obj in pairs(Workspace:GetChildren()) do
+        if obj:IsA("BasePart") and (obj.Name:lower():find("ball") or obj.Name:lower():find("soccer")) then
+            cachedBall = obj
+            return cachedBall
+        end
+    end
+    -- Alt klasörlerde arama (Gerekirse)
+    for _, obj in pairs(Workspace:GetDescendants()) do
+        if obj:IsA("BasePart") and (obj.Name:lower():find("ball") or obj.Name:lower():find("soccer")) then
+            cachedBall = obj
+            return cachedBall
+        end
+    end
+    return nil
+end
 
 -- --- ARAYÜZ TASARIMI ---
 local ScreenGui = Instance.new("ScreenGui")
@@ -43,7 +62,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
 Title.BorderSizePixel = 0
-Title.Text = "⚽ FUTBOL ESSENTIALS v2 ⚽"
+Title.Text = "⚡ OPTIMIZED FUTBOL HELPER ⚡"
 Title.TextColor3 = Color3.fromRGB(0, 255, 120)
 Title.Font = Enum.Font.Code
 Title.TextSize = 13
@@ -59,7 +78,6 @@ local Padding = Instance.new("UIPadding")
 Padding.PaddingTop = UDim.new(0, 42)
 Padding.Parent = MainFrame
 
--- --- BUTON OLUŞTURUCU ---
 local function CreateButton(id, text, callback)
     local Btn = Instance.new("TextButton")
     Btn.Size = UDim2.new(0.9, 0, 0, 32)
@@ -85,106 +103,90 @@ local function CreateButton(id, text, callback)
     end)
 end
 
--- --- 5 TEMEL ÖZELLİK ---
+-- --- ÖZELLİKLER ---
 
--- 1. TOP HITBOX BÜYÜTME
 CreateButton("BigBallHitbox", "TOP HITBOX BÜYÜT", function(v)
-    if not v then
-        for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:IsA("BasePart") and (obj.Name:lower():find("ball") or obj.Name:lower():find("soccer")) then
-                obj.Size = Vector3.new(2, 2, 2)
-            end
+    local ball = GetBall()
+    if ball then
+        if v then
+            ball.Size = Vector3.new(4.5, 4.5, 4.5) -- Kasma yapmayan ideal boyut
+        else
+            ball.Size = Vector3.new(2, 2, 2)
         end
     end
 end)
 
--- 2. DEPAR HIZI (SPRINT BOOST)
 CreateButton("SprintSpeed", "DEPAR HIZINI ARTTIR", function(v)
     if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid.WalkSpeed = v and 26 or 16
+        LP.Character.Humanoid.WalkSpeed = v and 25 or 16
     end
 end)
 
--- 3. SAHA AYDINLATMA (FULLBRIGHT)
 CreateButton("BrightMode", "SAHA AYDINLATMA", function(v)
     Lighting.Ambient = v and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(128, 128, 128)
 end)
 
--- 4. HIZLI DRİBLİNG / ADAM GEÇME MODU
 CreateButton("FastDribble", "HIZLI DRİBLİNG / MANEVRA", function(v)
     if LP.Character and LP.Character:FindFirstChild("Humanoid") then
         LP.Character.Humanoid.AutoRotate = true
     end
 end)
 
--- 5. ADAM VE TOP BOX GÖRSELLEŞTİRİCİ
 CreateButton("BoxVisuals", "ADAMLARA VE TOPA BOX KOY", function(v)
     if not v then
-        -- Kapatılınca oluşturulan Box'ları temizle
-        for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:FindFirstChild("TargetBox") then
-                obj.TargetBox:Destroy()
+        -- Kapatılınca kutuları temizle
+        local ball = GetBall()
+        if ball and ball:FindFirstChild("BallBox") then ball.BallBox:Destroy() end
+        
+        for _, player in pairs(Players:GetPlayers()) do
+            if player.Character and player.Character:FindFirstChild("PlayerBox") then
+                player.Character.PlayerBox:Destroy()
             end
+        end
+    else
+        -- Açılınca Topa Kutu Ekle
+        local ball = GetBall()
+        if ball and not ball:FindFirstChild("BallBox") then
+            local box = Instance.new("SelectionBox")
+            box.Name = "BallBox"
+            box.Color3 = Color3.fromRGB(0, 255, 120)
+            box.Adornee = ball
+            box.Parent = ball
         end
     end
 end)
 
--- --- SÜREKLİ MOTOR DÖNGÜSÜ ---
-RS.RenderStepped:Connect(function()
-    -- Top Hitbox Kontrolü (Topu büyütür)
-    if _G.FutCore.BigBallHitbox then
-        for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:IsA("BasePart") and (obj.Name:lower():find("ball") or obj.Name:lower():find("soccer")) then
-                obj.Size = Vector3.new(5.5, 5.5, 5.5)
-                obj.CanCollide = true
-            end
-        end
-    end
-
-    -- Hızlı Dribling Manevrası
+-- --- SADECE GEREKLİ İŞLEMLER İÇİN HAFİF DÖNGÜ ---
+RS.Stepped:Connect(function()
+    -- Dribling desteği
     if _G.FutCore.FastDribble and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         local hum = LP.Character.Humanoid
         if hum.MoveDirection.Magnitude > 0 then
-            LP.Character:TranslateBy(hum.MoveDirection * 0.12)
+            LP.Character:TranslateBy(hum.MoveDirection * 0.08)
         end
     end
 
-    -- Adamlara ve Topa Box Koyma Mantığı
+    -- Adamların Kutusunu Kontrol Et (Performanslı Yöntem)
     if _G.FutCore.BoxVisuals then
-        -- 1. Topa Yeşil Kutu Koy
-        for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:IsA("BasePart") and (obj.Name:lower():find("ball") or obj.Name:lower():find("soccer")) then
-                if not obj:FindFirstChild("TargetBox") then
-                    local box = Instance.new("SelectionBox")
-                    box.Name = "TargetBox"
-                    box.Color3 = Color3.fromRGB(0, 255, 120) -- Yeşil
-                    box.Adornee = obj
-                    box.Parent = obj
-                end
-            end
-        end
-
-        -- 2. DİĞER OYUNCULARA (ADAMLARA) KIZIL KUTU KOY
         for _, player in pairs(Players:GetPlayers()) do
             if player ~= LP and player.Character then
-                local root = player.Character:FindFirstChild("HumanoidRootPart")
-                if root and not root:FindFirstChild("TargetBox") then
+                if not player.Character:FindFirstChild("PlayerBox") then
                     local box = Instance.new("SelectionBox")
-                    box.Name = "TargetBox"
-                    box.Color3 = Color3.fromRGB(255, 50, 50) -- Kırmızı
+                    box.Name = "PlayerBox"
+                    box.Color3 = Color3.fromRGB(255, 50, 50)
                     box.Adornee = player.Character
-                    box.Parent = root
+                    box.Parent = player.Character
                 end
             end
         end
     end
 end)
 
--- --- INSERT İLE GİZLE / GÖSTER ---
+-- INSERT ile Aç/Kapa
 UIS.InputBegan:Connect(function(input, gpe)
     if not gpe and input.KeyCode == Enum.KeyCode.Insert then
         MainFrame.Visible = not MainFrame.Visible
     end
 end)
 
-print("⚽ 5 ÖZELLİKLİ FUTBOL HELPER YÜKLENDİ!")
+print("⚡ OPTİMİZE EDİLMİŞ FUTBOL SCRIPT YÜKLENDİ!")
