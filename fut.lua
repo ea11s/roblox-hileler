@@ -1,4 +1,4 @@
--- [[ OPTİMİZE EDİLMİŞ 0 KASMA FUTBOL HELPER ]] --
+-- [[ ODAKLANMIŞ SIFIR KASMA & YÜKSEK HIZ FUTBOL HELPER ]] --
 -- [[ Menü Aç/Kapa: INSERT Tuşu ]] --
 
 local Players = game:GetService("Players")
@@ -9,7 +9,6 @@ local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
 local LP = Players.LocalPlayer
 
--- Eski menü varsa temizle
 if CoreGui:FindFirstChild("FutbolCoreMenu") then
     CoreGui.FutbolCoreMenu:Destroy()
 end
@@ -22,7 +21,7 @@ _G.FutCore = {
     BoxVisuals    = false
 }
 
--- TOPU YALNIZCA BİR KERE BULMA MOTORU (FPS DÜŞÜŞÜNÜ ÖNLER)
+-- TOPU YALNIZCA BİR KERE BULMA MOTORU
 local cachedBall = nil
 local function GetBall()
     if cachedBall and cachedBall.Parent then return cachedBall end
@@ -32,7 +31,6 @@ local function GetBall()
             return cachedBall
         end
     end
-    -- Alt klasörlerde arama (Gerekirse)
     for _, obj in pairs(Workspace:GetDescendants()) do
         if obj:IsA("BasePart") and (obj.Name:lower():find("ball") or obj.Name:lower():find("soccer")) then
             cachedBall = obj
@@ -62,10 +60,10 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
 Title.BorderSizePixel = 0
-Title.Text = "⚡ OPTIMIZED FUTBOL HELPER ⚡"
+Title.Text = "⚡ HYPER SPEED FUTBOL HELPER ⚡"
 Title.TextColor3 = Color3.fromRGB(0, 255, 120)
 Title.Font = Enum.Font.Code
-Title.TextSize = 13
+Title.TextSize = 12
 Title.Parent = MainFrame
 
 local Layout = Instance.new("UIListLayout")
@@ -109,7 +107,7 @@ CreateButton("BigBallHitbox", "TOP HITBOX BÜYÜT", function(v)
     local ball = GetBall()
     if ball then
         if v then
-            ball.Size = Vector3.new(4.5, 4.5, 4.5) -- Kasma yapmayan ideal boyut
+            ball.Size = Vector3.new(4.5, 4.5, 4.5)
         else
             ball.Size = Vector3.new(2, 2, 2)
         end
@@ -117,8 +115,8 @@ CreateButton("BigBallHitbox", "TOP HITBOX BÜYÜT", function(v)
 end)
 
 CreateButton("SprintSpeed", "DEPAR HIZINI ARTTIR", function(v)
-    if LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid.WalkSpeed = v and 25 or 16
+    if not v and LP.Character and LP.Character:FindFirstChild("Humanoid") then
+        LP.Character.Humanoid.WalkSpeed = 16
     end
 end)
 
@@ -134,7 +132,6 @@ end)
 
 CreateButton("BoxVisuals", "ADAMLARA VE TOPA BOX KOY", function(v)
     if not v then
-        -- Kapatılınca kutuları temizle
         local ball = GetBall()
         if ball and ball:FindFirstChild("BallBox") then ball.BallBox:Destroy() end
         
@@ -144,7 +141,6 @@ CreateButton("BoxVisuals", "ADAMLARA VE TOPA BOX KOY", function(v)
             end
         end
     else
-        -- Açılınca Topa Kutu Ekle
         local ball = GetBall()
         if ball and not ball:FindFirstChild("BallBox") then
             local box = Instance.new("SelectionBox")
@@ -156,17 +152,23 @@ CreateButton("BoxVisuals", "ADAMLARA VE TOPA BOX KOY", function(v)
     end
 end)
 
--- --- SADECE GEREKLİ İŞLEMLER İÇİN HAFİF DÖNGÜ ---
+-- --- PERFORMANSLI VE SÜREKLİ ZORLAYICI MOTOR DÖNGÜSÜ ---
 RS.Stepped:Connect(function()
-    -- Dribling desteği
+    -- 1. SÜREKLİ HIZ KİLİDİ (Oyunun hızı sıfırlamasını engeller)
+    if _G.FutCore.SprintSpeed and LP.Character and LP.Character:FindFirstChild("Humanoid") then
+        LP.Character.Humanoid.WalkSpeed = 32 -- Hız 32'ye sabitlendi
+    end
+
+    -- 2. DRİBLİNG VE EKSTRA İVME (CFrame Boost)
     if _G.FutCore.FastDribble and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         local hum = LP.Character.Humanoid
         if hum.MoveDirection.Magnitude > 0 then
-            LP.Character:TranslateBy(hum.MoveDirection * 0.08)
+            -- Karakterin bastığı yöne doğru fazladan itim kuvveti uygular
+            LP.Character:TranslateBy(hum.MoveDirection * 0.22)
         end
     end
 
-    -- Adamların Kutusunu Kontrol Et (Performanslı Yöntem)
+    -- 3. BOX VISUALS DÖNGÜSÜ
     if _G.FutCore.BoxVisuals then
         for _, player in pairs(Players:GetPlayers()) do
             if player ~= LP and player.Character then
@@ -189,4 +191,4 @@ UIS.InputBegan:Connect(function(input, gpe)
     end
 end)
 
-print("⚡ OPTİMİZE EDİLMİŞ FUTBOL SCRIPT YÜKLENDİ!")
+print("⚡ HYPER SPEED FUTBOL SCRIPT YÜKLENDİ!")
