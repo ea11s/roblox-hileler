@@ -1,5 +1,5 @@
--- [[ TUŞ ATAMALI ( " ) LEGIT FUTBOL HELPER ]] --
--- [[ Hız Tuşu: " ]] --
+-- [[ ESKİ MENÜYÜ OTOMATİK TEMİZLEYEN & V TUŞLU FUTBOL HELPER ]] --
+-- [[ Hız Tuşu: V ]] --
 -- [[ Menü Aç/Kapa: INSERT ]] --
 
 local Players = game:GetService("Players")
@@ -10,10 +10,30 @@ local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
 local LP = Players.LocalPlayer
 
+-- ==========================================
+-- 🧹 1. ESKİ MENÜ VE KALINTILARI TEMİZLEME
+-- ==========================================
+if _G.FutCore then
+    _G.FutCore.BigBallHitbox = false
+    _G.FutCore.SprintSpeed   = false
+    _G.FutCore.BrightMode    = false
+    _G.FutCore.FastDribble   = false
+    _G.FutCore.BoxVisuals    = false
+end
+
+for _, obj in pairs(Workspace:GetDescendants()) do
+    if obj:FindFirstChild("BallBox") then obj.BallBox:Destroy() end
+    if obj:FindFirstChild("PlayerBox") then obj.PlayerBox:Destroy() end
+    if obj:FindFirstChild("TargetBox") then obj.TargetBox:Destroy() end
+end
+
 if CoreGui:FindFirstChild("FutbolCoreMenu") then
     CoreGui.FutbolCoreMenu:Destroy()
 end
 
+-- ==========================================
+-- ⚙️ 2. YENİ DEĞİŞKENLER VE MOTOR
+-- ==========================================
 _G.FutCore = {
     BigBallHitbox = false,
     SprintSpeed   = false,
@@ -60,7 +80,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
 Title.BorderSizePixel = 0
-Title.Text = "🛡️ LEGIT SAFE FUTBOL HELPER 🛡️"
+Title.Text = "⚡ HYPER SPEED FUTBOL HELPER ⚡"
 Title.TextColor3 = Color3.fromRGB(0, 255, 120)
 Title.Font = Enum.Font.Code
 Title.TextSize = 12
@@ -113,14 +133,14 @@ CreateButton("BigBallHitbox", "TOP HITBOX BÜYÜT", function(v)
     local ball = GetBall()
     if ball then
         if v then
-            ball.Size = Vector3.new(4, 4, 4)
+            ball.Size = Vector3.new(4.5, 4.5, 4.5)
         else
             ball.Size = Vector3.new(2, 2, 2)
         end
     end
 end)
 
-CreateButton("SprintSpeed", "LEGIT SPRINT [TUŞ: \"]", function(v)
+CreateButton("SprintSpeed", "DEPAR HIZI [TUŞ: V]", function(v)
     if not v and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         LP.Character.Humanoid.WalkSpeed = 16
     end
@@ -130,7 +150,7 @@ CreateButton("BrightMode", "SAHA AYDINLATMA", function(v)
     Lighting.Ambient = v and Color3.fromRGB(255, 255, 255) or Color3.fromRGB(128, 128, 128)
 end)
 
-CreateButton("FastDribble", "LEGIT MANEVRA DOKUNUŞU", function(v)
+CreateButton("FastDribble", "HIZLI DRİBLİNG / MANEVRA", function(v)
     if LP.Character and LP.Character:FindFirstChild("Humanoid") then
         LP.Character.Humanoid.AutoRotate = true
     end
@@ -160,17 +180,20 @@ end)
 
 -- --- DÖNGÜ MOTORU ---
 RS.Stepped:Connect(function()
+    -- SERT HIZ (WalkSpeed = 30)
     if _G.FutCore.SprintSpeed and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid.WalkSpeed = 21.5
+        LP.Character.Humanoid.WalkSpeed = 30
     end
 
+    -- YÜKSEK MANEVRA & DRİBLİNG İVMESİ
     if _G.FutCore.FastDribble and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         local hum = LP.Character.Humanoid
         if hum.MoveDirection.Magnitude > 0 then
-            LP.Character:TranslateBy(hum.MoveDirection * 0.05)
+            LP.Character:TranslateBy(hum.MoveDirection * 0.15)
         end
     end
 
+    -- BOX VISUALS
     if _G.FutCore.BoxVisuals then
         for _, player in pairs(Players:GetPlayers()) do
             if player ~= LP and player.Character then
@@ -186,7 +209,7 @@ RS.Stepped:Connect(function()
     end
 end)
 
--- --- KLAVYE DİNLENMESİ ( " VE INSERT TUŞLARI ) ---
+-- --- KLAVYE DİNLENMESİ ( V VE INSERT TUŞLARI ) ---
 UIS.InputBegan:Connect(function(input, gpe)
     if gpe then return end
     
@@ -195,8 +218,8 @@ UIS.InputBegan:Connect(function(input, gpe)
         MainFrame.Visible = not MainFrame.Visible
     end
     
-    -- " (Çift Tırnak / QuotedDouble) : Hız Aç / Kapa
-    if input.KeyCode == Enum.KeyCode.QuotedDouble or input.KeyCode == Enum.KeyCode.Quote then
+    -- V TUŞU: Hız Aç / Kapa
+    if input.KeyCode == Enum.KeyCode.V then
         _G.FutCore.SprintSpeed = not _G.FutCore.SprintSpeed
         local state = _G.FutCore.SprintSpeed
         
@@ -205,7 +228,7 @@ UIS.InputBegan:Connect(function(input, gpe)
         end
         
         if speedButtonRef then
-            speedButtonRef.Text = "LEGIT SPRINT [TUŞ: \"]" .. (state and ": AÇIK" or ": KAPALI")
+            speedButtonRef.Text = "DEPAR HIZI [TUŞ: V]" .. (state and ": AÇIK" or ": KAPALI")
             speedButtonRef.TextColor3 = state and Color3.fromRGB(0, 255, 120) or Color3.fromRGB(160, 160, 160)
             speedButtonRef.BorderColor3 = state and Color3.fromRGB(0, 255, 120) or Color3.fromRGB(50, 50, 55)
             speedButtonRef.BackgroundColor3 = state and Color3.fromRGB(15, 40, 25) or Color3.fromRGB(25, 25, 30)
@@ -213,4 +236,4 @@ UIS.InputBegan:Connect(function(input, gpe)
     end
 end)
 
-print("🛡️ LEGIT SAFE FUTBOL SCRIPT YÜKLENDİ! HIZ TUŞU: \"")
+print("⚡ ESKİ MENÜ TEMİZLENDİ VE YENİ SCRIPT YÜKLENDİ! HIZ TUŞU: V")
