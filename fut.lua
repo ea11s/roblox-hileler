@@ -1,4 +1,4 @@
--- [[ LEGIT WALK-ONLY (24 HIZ) FUTBOL HELPER ]] --
+-- [[ LEGIT WALK-ONLY (30 HIZ) FUTBOL HELPER ]] --
 -- [[ Hız Tuşu: V (Işınlanma/CFrame YOK - Votekick Safe) ]] --
 -- [[ Menü Aç/Kapa: INSERT ]] --
 
@@ -83,7 +83,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
 Title.BorderSizePixel = 0
-Title.Text = "🛡️ LEGIT SAFE (24 HIZ) FUTBOL 🛡️"
+Title.Text = "⚡ HYPER SPEED (30 HIZ) FUTBOL ⚡"
 Title.TextColor3 = Color3.fromRGB(0, 255, 120)
 Title.Font = Enum.Font.Code
 Title.TextSize = 12
@@ -143,7 +143,7 @@ CreateButton("BigBallHitbox", "TOP HITBOX BÜYÜT", function(v)
     end
 end)
 
-CreateButton("SprintSpeed", "LEGIT DEPAR (24) [TUŞ: V]", function(v)
+CreateButton("SprintSpeed", "DEPAR HIZI (30) [TUŞ: V]", function(v)
     if not v and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         LP.Character.Humanoid.WalkSpeed = 16
     end
@@ -183,9 +183,9 @@ end)
 
 -- --- DÖNGÜ MOTORU ---
 RS.Stepped:Connect(function()
-    -- SADECE YÜRÜME HIZI KİLİDİ (Işınlanma/TranslateBy Sıfırlandı)
+    -- SERT YÜRÜME HIZI (WalkSpeed = 30)
     if _G.FutCore.SprintSpeed and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid.WalkSpeed = 24
+        LP.Character.Humanoid.WalkSpeed = 30
     end
 
     -- BOX VISUALS
@@ -214,7 +214,7 @@ local function ToggleSpeed()
     end
     
     if speedButtonRef then
-        speedButtonRef.Text = "LEGIT DEPAR (24) [TUŞ: V]" .. (state and ": AÇIK" or ": KAPALI")
+        speedButtonRef.Text = "DEPAR HIZI (30) [TUŞ: V]" .. (state and ": AÇIK" or ": KAPALI")
         speedButtonRef.TextColor3 = state and Color3.fromRGB(0, 255, 120) or Color3.fromRGB(160, 160, 160)
         speedButtonRef.BorderColor3 = state and Color3.fromRGB(0, 255, 120) or Color3.fromRGB(50, 50, 55)
         speedButtonRef.BackgroundColor3 = state and Color3.fromRGB(15, 40, 25) or Color3.fromRGB(25, 25, 30)
@@ -235,4 +235,4 @@ UIS.InputBegan:Connect(function(input, gpe)
     end
 end)
 
-print("🛡️ VOTEKICK SAFE (24 HIZ) SCRIPT YÜKLENDİ! V TUŞU İLE DEPAR ATABİLİRSİN.")
+print("⚡ 30 HIZ SCRIPT YÜKLENDİ! V TUŞU İLE DEPAR ATABİLİRSİN.")
