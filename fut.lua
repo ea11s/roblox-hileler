@@ -1,5 +1,5 @@
--- [[ OTOMATİK TEMİZLEMELİ & DÜZELTİLMİŞ V TUŞLU (28 HIZ) FUTBOL HELPER ]] --
--- [[ Hız Tuşu: V ]] --
+-- [[ LEGIT WALK-ONLY (24 HIZ) FUTBOL HELPER ]] --
+-- [[ Hız Tuşu: V (Işınlanma/CFrame YOK - Votekick Safe) ]] --
 -- [[ Menü Aç/Kapa: INSERT ]] --
 
 local Players = game:GetService("Players")
@@ -83,7 +83,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(22, 22, 28)
 Title.BorderSizePixel = 0
-Title.Text = "⚡ 28 HIZ FUTBOL HELPER ⚡"
+Title.Text = "🛡️ LEGIT SAFE (24 HIZ) FUTBOL 🛡️"
 Title.TextColor3 = Color3.fromRGB(0, 255, 120)
 Title.Font = Enum.Font.Code
 Title.TextSize = 12
@@ -136,14 +136,14 @@ CreateButton("BigBallHitbox", "TOP HITBOX BÜYÜT", function(v)
     local ball = GetBall()
     if ball then
         if v then
-            ball.Size = Vector3.new(4.5, 4.5, 4.5)
+            ball.Size = Vector3.new(4, 4, 4)
         else
             ball.Size = Vector3.new(2, 2, 2)
         end
     end
 end)
 
-CreateButton("SprintSpeed", "DEPAR HIZI (28) [TUŞ: V]", function(v)
+CreateButton("SprintSpeed", "LEGIT DEPAR (24) [TUŞ: V]", function(v)
     if not v and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         LP.Character.Humanoid.WalkSpeed = 16
     end
@@ -183,17 +183,9 @@ end)
 
 -- --- DÖNGÜ MOTORU ---
 RS.Stepped:Connect(function()
-    -- SERT HIZ (WalkSpeed = 28)
+    -- SADECE YÜRÜME HIZI KİLİDİ (Işınlanma/TranslateBy Sıfırlandı)
     if _G.FutCore.SprintSpeed and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid.WalkSpeed = 28
-    end
-
-    -- MANEVRA & DRİBLİNG İVMESİ
-    if _G.FutCore.FastDribble and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        local hum = LP.Character.Humanoid
-        if hum.MoveDirection.Magnitude > 0 then
-            LP.Character:TranslateBy(hum.MoveDirection * 0.15)
-        end
+        LP.Character.Humanoid.WalkSpeed = 24
     end
 
     -- BOX VISUALS
@@ -222,14 +214,14 @@ local function ToggleSpeed()
     end
     
     if speedButtonRef then
-        speedButtonRef.Text = "DEPAR HIZI (28) [TUŞ: V]" .. (state and ": AÇIK" or ": KAPALI")
+        speedButtonRef.Text = "LEGIT DEPAR (24) [TUŞ: V]" .. (state and ": AÇIK" or ": KAPALI")
         speedButtonRef.TextColor3 = state and Color3.fromRGB(0, 255, 120) or Color3.fromRGB(160, 160, 160)
         speedButtonRef.BorderColor3 = state and Color3.fromRGB(0, 255, 120) or Color3.fromRGB(50, 50, 55)
         speedButtonRef.BackgroundColor3 = state and Color3.fromRGB(15, 40, 25) or Color3.fromRGB(25, 25, 30)
     end
 end
 
--- --- V TUŞU İÇİN ÇİFT EMNİYETLİ DİNLENME ---
+-- --- V TUŞU DİNLENMESİ ---
 CAS:BindAction("ToggleSpeedAction", function(actionName, inputState, inputObj)
     if inputState == Enum.UserInputState.Begin then
         ToggleSpeed()
@@ -243,4 +235,4 @@ UIS.InputBegan:Connect(function(input, gpe)
     end
 end)
 
-print("⚡ 28 HIZ SCRIPT YÜKLENDİ! V TUŞU KİLİTLENDİ.")
+print("🛡️ VOTEKICK SAFE (24 HIZ) SCRIPT YÜKLENDİ! V TUŞU İLE DEPAR ATABİLİRSİN.")
