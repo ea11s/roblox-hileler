@@ -1,4 +1,4 @@
--- [[ THE WALKING DEAD ULTIMATE HELPER - FIXED & SOFT AIMBOT ]] --
+-- [[ THE WALKING DEAD - LAG-FREE & FULL CLEANUP HELPER ]] --
 -- [[ Menü Aç/Kapa: INSERT ]] --
 
 local Players = game:GetService("Players")
@@ -11,8 +11,10 @@ local LP = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
 -- ==========================================
--- 🧹 1. ESKİ MENÜ VE KALINTILARI TEMİZLEME
+-- 🧹 1. AGRESİF ESKİ MENÜ VE KALINTI TEMİZLİĞİ
 -- ==========================================
+_G.TWDCoreRun = false -- Eski çalışan task döngülerini durdurur
+
 if _G.TWDCore then
     _G.TWDCore.SprintSpeed = false
     _G.TWDCore.FullBright  = false
@@ -24,18 +26,26 @@ if _G.TWDCore then
     _G.TWDCore.Aimbot      = false
 end
 
+-- Eski ESP nesnelerini temizle
 for _, obj in pairs(Workspace:GetDescendants()) do
-    if obj:FindFirstChild("TWDESP") or obj:FindFirstChild("TWDLootESP") then
+    if obj.Name == "TWD_ESP_OBJ" or obj.Name == "TWDESP" or obj.Name == "TWDLootESP" or obj.Name == "TWDZombieESP" or obj.Name == "TWDPlayerESP" then
         obj:Destroy()
     end
 end
 
-if CoreGui:FindFirstChild("TWDCoreMenu") then
-    CoreGui.TWDCoreMenu:Destroy()
+-- Eski GUI ve Nişan noktalarını temizle
+for _, menuName in pairs({"TWDCoreMenu", "FutbolCoreMenu", "TWDCrosshair"}) do
+    local oldMenu = CoreGui:FindFirstChild(menuName)
+    if oldMenu then
+        oldMenu:Destroy()
+    end
 end
 
+task.wait(0.1)
+_G.TWDCoreRun = true -- Yeni döngüyü başlat
+
 -- ==========================================
--- ⚙️ 2. DEĞİŞKENLER VE AYARLAR
+-- ⚙️ 2. AYARLAR VE ÖNBELLEK
 -- ==========================================
 _G.TWDCore = {
     SprintSpeed = false,
@@ -48,19 +58,19 @@ _G.TWDCore = {
     Aimbot      = false
 }
 
-local Smoothness = 0.15 -- Aimbot kayma hızı (Daha küçük değer = daha yavaş/doğal kayma)
-local FOV = 250 -- Aimbot arama alanı genişliği
+local Smoothness = 0.18
+local FOV = 200
 
--- --- ARAYÜZ TASARIMI ---
+-- GUI Yapısı
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "TWDCoreMenu"
 ScreenGui.Parent = CoreGui
 ScreenGui.ResetOnSpawn = false
 
 local MainFrame = Instance.new("Frame")
-MainFrame.Size = UDim2.new(0, 280, 0, 380)
+MainFrame.Size = UDim2.new(0, 270, 0, 370)
 MainFrame.Position = UDim2.new(0.05, 0, 0.25, 0)
-MainFrame.BackgroundColor3 = Color3.fromRGB(18, 15, 15)
+MainFrame.BackgroundColor3 = Color3.fromRGB(15, 15, 15)
 MainFrame.BorderSizePixel = 1
 MainFrame.BorderColor3 = Color3.fromRGB(255, 60, 60)
 MainFrame.Active = true
@@ -69,9 +79,9 @@ MainFrame.Parent = ScreenGui
 
 local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
-Title.BackgroundColor3 = Color3.fromRGB(28, 20, 20)
+Title.BackgroundColor3 = Color3.fromRGB(25, 20, 20)
 Title.BorderSizePixel = 0
-Title.Text = "🧟 TWD ULTIMATE HELPER + AIMBOT 🧟"
+Title.Text = "⚡ TWD HELPER (CLEAN & FAST) ⚡"
 Title.TextColor3 = Color3.fromRGB(255, 60, 60)
 Title.Font = Enum.Font.Code
 Title.TextSize = 12
@@ -79,22 +89,22 @@ Title.Parent = MainFrame
 
 local Layout = Instance.new("UIListLayout")
 Layout.Parent = MainFrame
-Layout.Padding = UDim.new(0, 6)
+Layout.Padding = UDim.new(0, 5)
 Layout.HorizontalAlignment = Enum.HorizontalAlignment.Center
 Layout.SortOrder = Enum.SortOrder.LayoutOrder
 
 local Padding = Instance.new("UIPadding")
-Padding.PaddingTop = UDim.new(0, 42)
+Padding.PaddingTop = UDim.new(0, 40)
 Padding.Parent = MainFrame
 
 local function CreateButton(id, text, callback)
     local Btn = Instance.new("TextButton")
     Btn.Size = UDim2.new(0.92, 0, 0, 32)
-    Btn.BackgroundColor3 = Color3.fromRGB(30, 25, 25)
+    Btn.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
     Btn.BorderSizePixel = 1
-    Btn.BorderColor3 = Color3.fromRGB(60, 50, 50)
+    Btn.BorderColor3 = Color3.fromRGB(50, 50, 50)
     Btn.Text = text .. ": KAPALI"
-    Btn.TextColor3 = Color3.fromRGB(160, 160, 160)
+    Btn.TextColor3 = Color3.fromRGB(150, 150, 150)
     Btn.Font = Enum.Font.Code
     Btn.TextSize = 11
     Btn.Parent = MainFrame
@@ -104,19 +114,18 @@ local function CreateButton(id, text, callback)
         local state = _G.TWDCore[id]
 
         Btn.Text = text .. (state and ": AÇIK" or ": KAPALI")
-        Btn.TextColor3 = state and Color3.fromRGB(255, 60, 60) or Color3.fromRGB(160, 160, 160)
-        Btn.BorderColor3 = state and Color3.fromRGB(255, 60, 60) or Color3.fromRGB(60, 50, 50)
-        Btn.BackgroundColor3 = state and Color3.fromRGB(45, 15, 15) or Color3.fromRGB(30, 25, 25)
+        Btn.TextColor3 = state and Color3.fromRGB(255, 60, 60) or Color3.fromRGB(150, 150, 150)
+        Btn.BorderColor3 = state and Color3.fromRGB(255, 60, 60) or Color3.fromRGB(50, 50, 50)
+        Btn.BackgroundColor3 = state and Color3.fromRGB(35, 15, 15) or Color3.fromRGB(25, 25, 25)
 
         if callback then callback(state) end
     end)
 end
 
 -- ==========================================
--- 🛠️ 3. ÖZELLİKLER VE BUTONLAR
+-- 🛠️ 3. BUTONLAR
 -- ==========================================
-
-CreateButton("Aimbot", "SOFT AIMBOT (ATEŞ EDİNCE)", function(v) end)
+CreateButton("Aimbot", "SOFT AIMBOT (SOL TIK)", function(v) end)
 
 CreateButton("SprintSpeed", "HIZLI KOŞMA (30 HIZ)", function(v)
     if not v and LP.Character and LP.Character:FindFirstChild("Humanoid") then
@@ -127,14 +136,13 @@ end)
 CreateButton("HighJump", "YÜKSEK ZIPLAMA", function(v)
     if not v and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         LP.Character.Humanoid.JumpPower = 50
-        LP.Character.Humanoid.JumpHeight = 7.2
     end
 end)
 
 CreateButton("ZombieESP", "ZOMBİ ESP (KIRMIZI)", function(v)
     if not v then
         for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj.Name == "TWDZombieESP" then
+            if obj.Name == "TWD_ESP_OBJ" and obj:GetAttribute("ESPType") == "Zombie" then
                 obj:Destroy()
             end
         end
@@ -143,10 +151,9 @@ end)
 
 CreateButton("PlayerESP", "OYUNCU ESP (MAVİ)", function(v)
     if not v then
-        for _, player in pairs(Players:GetPlayers()) do
-            if player.Character then
-                local esp = player.Character:FindFirstChild("TWDPlayerESP")
-                if esp then esp:Destroy() end
+        for _, obj in pairs(Workspace:GetDescendants()) do
+            if obj.Name == "TWD_ESP_OBJ" and obj:GetAttribute("ESPType") == "Player" then
+                obj:Destroy()
             end
         end
     end
@@ -155,140 +162,136 @@ end)
 CreateButton("LootESP", "EŞYA / LOOT ESP (YEŞİL)", function(v)
     if not v then
         for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj.Name == "TWDLootESP" then
+            if obj.Name == "TWD_ESP_OBJ" and obj:GetAttribute("ESPType") == "Loot" then
                 obj:Destroy()
             end
         end
     end
 end)
 
-CreateButton("FullBright", "GECE / GECE GÖRÜŞÜ AÇ", function(v)
+CreateButton("FullBright", "GECE / GECE GÖRÜŞÜ", function(v)
     if v then
         Lighting.Ambient = Color3.fromRGB(255, 255, 255)
         Lighting.Brightness = 2
-        Lighting.ClockTime = 14
     else
         Lighting.Ambient = Color3.fromRGB(128, 128, 128)
         Lighting.Brightness = 1
     end
 end)
 
-CreateButton("NoFog", "SİS VE KARANLIĞI SİL", function(v)
+CreateButton("NoFog", "SİS KALDIR", function(v)
     Lighting.FogEnd = v and 100000 or 1000
 end)
 
 -- ==========================================
--- 🎯 4. AIMBOT YARDIMCI FONKSİYONU
+-- 🎯 4. AIMBOT VE HAFİF MANTIK
 -- ==========================================
 local function GetClosestTarget()
-    local closestTarget = nil
-    local shortestDistance = FOV
+    local closest = nil
+    local shortest = FOV
+    local mousePos = UIS:GetMouseLocation()
 
-    for _, obj in pairs(Workspace:GetDescendants()) do
-        if obj:IsA("Model") and obj:FindFirstChild("Humanoid") and obj:FindFirstChild("Head") then
-            -- Zombi veya Düşman kontrolü
-            if not Players:GetPlayerFromCharacter(obj) and obj.Humanoid.Health > 0 then
-                local head = obj.Head
-                local pos, onScreen = Camera:WorldToViewportPoint(head.Position)
+    for _, obj in pairs(Workspace:GetChildren()) do
+        if obj:IsA("Model") and obj:FindFirstChild("Head") and not Players:GetPlayerFromCharacter(obj) then
+            local hum = obj:FindFirstChildOfClass("Humanoid")
+            if hum and hum.Health > 0 then
+                local pos, onScreen = Camera:WorldToViewportPoint(obj.Head.Position)
                 if onScreen then
-                    local mousePos = UIS:GetMouseLocation()
-                    local distance = (Vector2.new(pos.X, pos.Y) - mousePos).Magnitude
-                    if distance < shortestDistance then
-                        shortestDistance = distance
-                        closestTarget = head
+                    local dist = (Vector2.new(pos.X, pos.Y) - mousePos).Magnitude
+                    if dist < shortest then
+                        shortest = dist
+                        closest = obj.Head
                     end
                 end
             end
         end
     end
-    return closestTarget
+    return closest
 end
 
 -- ==========================================
--- 🔄 5. DÖNGÜ MOTORU
+-- 🔄 5. DÖNGÜLER (FPS DOSTU)
 -- ==========================================
-RS.RenderStepped:Connect(function()
-    -- 30 YÜRÜME HIZI
+
+-- A) Sadece fizik ve hareketler (Her kare)
+RS.Heartbeat:Connect(function()
     if _G.TWDCore.SprintSpeed and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         LP.Character.Humanoid.WalkSpeed = 30
     end
 
-    -- ZIPLAMA DÜZELTME (Hem JumpPower hem JumpHeight zorlanır)
     if _G.TWDCore.HighJump and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         local hum = LP.Character.Humanoid
         hum.UseJumpPower = true
-        hum.JumpPower = 100
-        hum.JumpHeight = 25
+        hum.JumpPower = 90
     end
 
-    -- SADECE ATEŞ EDERKEN (SOL TIK BASILIYKEN) ÇALIŞAN SOFT AIMBOT
     if _G.TWDCore.Aimbot and UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton1) then
-        local targetHead = GetClosestTarget()
-        if targetHead then
-            local targetCFrame = CFrame.new(Camera.CFrame.Position, targetHead.Position)
-            Camera.CFrame = Camera.CFrame:Lerp(targetCFrame, Smoothness)
+        local target = GetClosestTarget()
+        if target then
+            Camera.CFrame = Camera.CFrame:Lerp(CFrame.new(Camera.CFrame.Position, target.Position), Smoothness)
         end
     end
+end)
 
-    -- ZOMBİ / DÜŞMAN ESP (Tüm workspace taraması)
-    if _G.TWDCore.ZombieESP then
-        for _, obj in pairs(Workspace:GetDescendants()) do
-            if obj:IsA("Model") and obj:FindFirstChild("Humanoid") and not Players:GetPlayerFromCharacter(obj) then
-                if obj.Humanoid.Health > 0 and not obj:FindFirstChild("TWDZombieESP") then
-                    local highlight = Instance.new("Highlight")
-                    highlight.Name = "TWDZombieESP"
-                    highlight.FillColor = Color3.fromRGB(255, 30, 30)
-                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                    highlight.FillTransparency = 0.4
-                    highlight.Adornee = obj
-                    highlight.Parent = obj
+-- B) ESP Tarama Döngüsü (Arka planda 0.5 saniyede bir çalışır)
+task.spawn(function()
+    while _G.TWDCoreRun do
+        task.wait(0.5)
+        
+        -- Zombi ESP
+        if _G.TWDCore.ZombieESP then
+            for _, obj in pairs(Workspace:GetChildren()) do
+                if obj:IsA("Model") and obj:FindFirstChildOfClass("Humanoid") and not Players:GetPlayerFromCharacter(obj) then
+                    if not obj:FindFirstChild("TWD_ESP_OBJ") then
+                        local h = Instance.new("Highlight")
+                        h.Name = "TWD_ESP_OBJ"
+                        h:SetAttribute("ESPType", "Zombie")
+                        h.FillColor = Color3.fromRGB(255, 30, 30)
+                        h.FillTransparency = 0.5
+                        h.Adornee = obj
+                        h.Parent = obj
+                    end
                 end
             end
         end
-    end
 
-    -- OYUNCU ESP
-    if _G.TWDCore.PlayerESP then
-        for _, player in pairs(Players:GetPlayers()) do
-            if player ~= LP and player.Character and player.Character:FindFirstChild("Humanoid") then
-                if player.Character.Humanoid.Health > 0 and not player.Character:FindFirstChild("TWDPlayerESP") then
-                    local highlight = Instance.new("Highlight")
-                    highlight.Name = "TWDPlayerESP"
-                    highlight.FillColor = Color3.fromRGB(0, 150, 255)
-                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                    highlight.FillTransparency = 0.4
-                    highlight.Adornee = player.Character
-                    highlight.Parent = player.Character
+        -- Oyuncu ESP
+        if _G.TWDCore.PlayerESP then
+            for _, player in pairs(Players:GetPlayers()) do
+                if player ~= LP and player.Character and not player.Character:FindFirstChild("TWD_ESP_OBJ") then
+                    local h = Instance.new("Highlight")
+                    h.Name = "TWD_ESP_OBJ"
+                    h:SetAttribute("ESPType", "Player")
+                    h.FillColor = Color3.fromRGB(0, 150, 255)
+                    h.FillTransparency = 0.5
+                    h.Adornee = player.Character
+                    h.Parent = player.Character
                 end
             end
         end
-    end
 
-    -- LOOT / EŞYA ESP
-    if _G.TWDCore.LootESP then
-        for _, obj in pairs(Workspace:GetChildren()) do
-            if (obj:IsA("Tool") or obj.Name:lower():find("loot") or obj.Name:lower():find("item") or obj.Name:lower():find("chest") or obj.Name:lower():find("crate")) then
-                if not obj:FindFirstChild("TWDLootESP") then
-                    local highlight = Instance.new("Highlight")
-                    highlight.Name = "TWDLootESP"
-                    highlight.FillColor = Color3.fromRGB(0, 255, 100)
-                    highlight.OutlineColor = Color3.fromRGB(255, 255, 255)
-                    highlight.FillTransparency = 0.4
-                    highlight.Adornee = obj
-                    highlight.Parent = obj
+        -- Loot ESP
+        if _G.TWDCore.LootESP then
+            for _, obj in pairs(Workspace:GetChildren()) do
+                if (obj:IsA("Tool") or obj.Name:lower():find("loot") or obj.Name:lower():find("item")) and not obj:FindFirstChild("TWD_ESP_OBJ") then
+                    local h = Instance.new("Highlight")
+                    h.Name = "TWD_ESP_OBJ"
+                    h:SetAttribute("ESPType", "Loot")
+                    h.FillColor = Color3.fromRGB(0, 255, 100)
+                    h.FillTransparency = 0.5
+                    h.Adornee = obj
+                    h.Parent = obj
                 end
             end
         end
     end
 end)
 
--- ==========================================
--- ⌨️ 6. KLAVYE DİNLENMESİ
--- ==========================================
+-- Menü Aç/Kapa
 UIS.InputBegan:Connect(function(input, gpe)
     if input.KeyCode == Enum.KeyCode.Insert and not gpe then
         MainFrame.Visible = not MainFrame.Visible
     end
 end)
 
-print("🧟 TWD HELPER + SOFT AIMBOT YÜKLENDİ! MENÜ: INSERT")
+print("⚡ ESKİ MENÜLER TEMİZLENDİ & YENİ SCRIPT YÜKLENDİ!")
