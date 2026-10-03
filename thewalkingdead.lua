@@ -1,5 +1,7 @@
--- [[ THE WALKING DEAD - FIXED FLY & LOW STEP HELPER ]] --
+-- [[ THE WALKING DEAD - ULTIMATE PERFECT HELPER ]] --
 -- [[ Menü Aç/Kapa: INSERT ]] --
+-- [[ Aimbot: SAĞ TIK BASILI TUTUNCA ]] --
+-- [[ Uçma: SPACE BASILI TUTUNCA ]] --
 
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
@@ -11,7 +13,7 @@ local LP = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
 -- ==========================================
--- 🧹 1. TEMİZLİK
+-- 🧹 1. SIFIRLAMA VE TEMİZLİK
 -- ==========================================
 _G.TWDCoreRun = false
 
@@ -43,7 +45,7 @@ task.wait(0.1)
 _G.TWDCoreRun = true
 
 -- ==========================================
--- ⚙️ 2. AYARLAR
+-- ⚙️ 2. AYARLAR & HASSASİYET
 -- ==========================================
 _G.TWDCore = {
     SprintSpeed = false,
@@ -56,12 +58,12 @@ _G.TWDCore = {
     Aimbot      = false
 }
 
-local Smoothness = 0.12
-local TargetFOV = 200
-local StepMultiplier = 0.12 -- Takılmayı tamamen sıfırlamak için optimize edilmiş hız
-local FlyPower = 0.5 -- Akıcı ve dengeli yükselme hızı
+local Smoothness = 0.12     -- Soft Aimbot takip yumuşaklığı
+local TargetFOV = 200       -- Aimbot tarama çapı
+local StepMultiplier = 0.10 -- Takılmayı (rubberband) tamamen sıfırlayan hassas hız
+local FlyPower = 0.5       -- Akıcı yükselme hızı
 
--- GUI
+-- GUI Tasarımı
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "TWDCoreMenu"
 ScreenGui.Parent = CoreGui
@@ -81,7 +83,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(25, 20, 20)
 Title.BorderSizePixel = 0
-Title.Text = "⚡ TWD HELPER (FIXED FLY & SPEED) ⚡"
+Title.Text = "⚡ TWD ULTIMATE HELPER ⚡"
 Title.TextColor3 = Color3.fromRGB(255, 60, 60)
 Title.Font = Enum.Font.Code
 Title.TextSize = 11
@@ -123,7 +125,7 @@ local function CreateButton(id, text, callback)
 end
 
 -- ==========================================
--- 🛠️ 3. BUTONLAR
+-- 🛠️ 3. MENÜ BUTONLARI
 -- ==========================================
 CreateButton("Aimbot", "SOFT AIMBOT (SAĞ TIK)", function(v) end)
 CreateButton("SprintSpeed", "STABİL HIZ (TAKILMASIZ)", function(v) end)
@@ -174,7 +176,7 @@ CreateButton("NoFog", "SİS KALDIR", function(v)
 end)
 
 -- ==========================================
--- 🎯 4. AIMBOT TARAMASI
+-- 🎯 4. KASMASIZ AIMBOT TARGETING
 -- ==========================================
 local function GetClosestTarget()
     local closest = nil
@@ -200,9 +202,8 @@ local function GetClosestTarget()
 end
 
 -- ==========================================
--- 🔄 5. ANLIK DÖNGÜ
+-- 🔄 5. HER KARE HAREKET VE AIMBOT DÖNGÜSÜ
 -- ==========================================
-
 RS.RenderStepped:Connect(function()
     local char = LP.Character
     if not char then return end
@@ -216,12 +217,12 @@ RS.RenderStepped:Connect(function()
         end
     end
 
-    -- Düzeltilmiş Uçma Mantığı (Space Basılı Tutunca Yükselme)
+    -- Uçma Mantığı (Space basılı tuttukça yukarı kaydırır)
     if _G.TWDCore.FlyMode and hrp and UIS:IsKeyDown(Enum.KeyCode.Space) then
         hrp.CFrame = hrp.CFrame * CFrame.new(0, FlyPower, 0)
     end
 
-    -- Sağ Tık Aimbot
+    -- Sağ Tık Soft Aimbot
     if _G.TWDCore.Aimbot and UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
         local target = GetClosestTarget()
         if target then
@@ -230,7 +231,9 @@ RS.RenderStepped:Connect(function()
     end
 end)
 
--- Arka Plan ESP
+-- ==========================================
+-- 🔄 6. ARKA PLAN ESP DÖNGÜSÜ (0.5 Saniye)
+-- ==========================================
 task.spawn(function()
     while _G.TWDCoreRun do
         task.wait(0.5)
@@ -281,10 +284,11 @@ task.spawn(function()
     end
 end)
 
+-- Menü Kısayolu (INSERT)
 UIS.InputBegan:Connect(function(input, gpe)
     if input.KeyCode == Enum.KeyCode.Insert and not gpe then
         MainFrame.Visible = not MainFrame.Visible
     end
 end)
 
-print("⚡ FLY & LOW SPEED FIX YÜKLENDİ!")
+print("⚡ TWD ULTIMATE SCRIPT YARINA HAZIR!")
