@@ -1,7 +1,7 @@
--- [[ THE WALKING DEAD - ULTIMATE PERFECT HELPER ]] --
--- [[ Menü Aç/Kapa: INSERT ]] --
--- [[ Aimbot: SAĞ TIK BASILI TUTUNCA ]] --
--- [[ Uçma: SPACE BASILI TUTUNCA ]] --
+-- [[ THE WALKING DEAD - ULTIMATE HELPER ]]
+-- [[ Menü Aç/Kapa: INSERT ]]
+-- [[ Aimbot: SAĞ TIK BASILI TUTUNCA ]]
+-- [[ Uçma: SPACE BASILI TUTUNCA ]]
 
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
@@ -9,6 +9,7 @@ local UIS = game:GetService("UserInputService")
 local RS = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
+
 local LP = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
@@ -18,18 +19,13 @@ local Camera = Workspace.CurrentCamera
 _G.TWDCoreRun = false
 
 if _G.TWDCore then
-    _G.TWDCore.SprintSpeed = false
-    _G.TWDCore.FullBright  = false
-    _G.TWDCore.ZombieESP   = false
-    _G.TWDCore.PlayerESP   = false
-    _G.TWDCore.LootESP     = false
-    _G.TWDCore.FlyMode     = false
-    _G.TWDCore.NoFog       = false
-    _G.TWDCore.Aimbot      = false
+    for k, _ in pairs(_G.TWDCore) do
+        _G.TWDCore[k] = false
+    end
 end
 
 for _, obj in pairs(Workspace:GetDescendants()) do
-    if obj.Name == "TWD_ESP_OBJ" or obj.Name == "TWDESP" or obj.Name == "TWDLootESP" or obj.Name == "TWDZombieESP" or obj.Name == "TWDPlayerESP" then
+    if obj.Name == "TWD_ESP_OBJ" then
         obj:Destroy()
     end
 end
@@ -58,10 +54,10 @@ _G.TWDCore = {
     Aimbot      = false
 }
 
-local Smoothness = 0.12     -- Soft Aimbot takip yumuşaklığı
-local TargetFOV = 200       -- Aimbot tarama çapı
-local StepMultiplier = 0.10 -- Takılmayı (rubberband) tamamen sıfırlayan hassas hız
-local FlyPower = 0.5       -- Akıcı yükselme hızı
+local Smoothness = 0.12     -- Soft Aimbot yumuşaklığı
+local TargetFOV = 200       -- Aimbot menzili (piksel)
+local StepMultiplier = 0.10 -- Hız artırma adımı
+local FlySpeed = 25         -- Uçma hızı
 
 -- GUI Tasarımı
 local ScreenGui = Instance.new("ScreenGui")
@@ -161,13 +157,17 @@ CreateButton("LootESP", "EŞYA / LOOT ESP (YEŞİL)", function(v)
     end
 end)
 
-CreateButton("FullBright", "GECE / GECE GÖRÜŞÜ", function(v)
+CreateButton("FullBright", "FULLBRIGHT (TAM AYDINLATMA)", function(v)
     if v then
         Lighting.Ambient = Color3.fromRGB(255, 255, 255)
+        Lighting.OutdoorAmbient = Color3.fromRGB(255, 255, 255)
         Lighting.Brightness = 2
+        Lighting.GlobalShadows = false
     else
-        Lighting.Ambient = Color3.fromRGB(128, 128, 128)
+        Lighting.Ambient = Color3.fromRGB(127, 127, 127)
+        Lighting.OutdoorAmbient = Color3.fromRGB(127, 127, 127)
         Lighting.Brightness = 1
+        Lighting.GlobalShadows = true
     end
 end)
 
@@ -176,7 +176,7 @@ CreateButton("NoFog", "SİS KALDIR", function(v)
 end)
 
 -- ==========================================
--- 🎯 4. KASMASIZ AIMBOT TARGETING
+-- 🎯 4. AIMBOT TARGETING
 -- ==========================================
 local function GetClosestTarget()
     local closest = nil
@@ -184,9 +184,9 @@ local function GetClosestTarget()
     local mousePos = UIS:GetMouseLocation()
 
     for _, obj in pairs(Workspace:GetChildren()) do
-        if obj:IsA("Model") and obj:FindFirstChild("Head") and not Players:GetPlayerFromCharacter(obj) then
+        if obj:IsA("Model") and obj:FindFirstChild("Head") then
             local hum = obj:FindFirstChildOfClass("Humanoid")
-            if hum and hum.Health > 0 then
+            if hum and hum.Health > 0 and obj ~= LP.Character then
                 local pos, onScreen = Camera:WorldToViewportPoint(obj.Head.Position)
                 if onScreen then
                     local dist = (Vector2.new(pos.X, pos.Y) - mousePos).Magnitude
@@ -202,7 +202,7 @@ local function GetClosestTarget()
 end
 
 -- ==========================================
--- 🔄 5. HER KARE HAREKET VE AIMBOT DÖNGÜSÜ
+-- 🔄 5. HAREKET VE AIMBOT DÖNGÜSÜ
 -- ==========================================
 RS.RenderStepped:Connect(function()
     local char = LP.Character
@@ -210,19 +210,26 @@ RS.RenderStepped:Connect(function()
     local hum = char:FindFirstChildOfClass("Humanoid")
     local hrp = char:FindFirstChild("HumanoidRootPart")
 
-    -- Hassas Mikro-CFrame Hızlandırma
+    -- Stabil Hız Artışı
     if _G.TWDCore.SprintSpeed and hum and hrp then
         if hum.MoveDirection.Magnitude > 0 then
             hrp.CFrame = hrp.CFrame + (hum.MoveDirection * StepMultiplier)
         end
     end
 
-    -- Uçma Mantığı (Space basılı tuttukça yukarı kaydırır)
-    if _G.TWDCore.FlyMode and hrp and UIS:IsKeyDown(Enum.KeyCode.Space) then
-        hrp.CFrame = hrp.CFrame * CFrame.new(0, FlyPower, 0)
+    -- Uçma Modu
+    if _G.TWDCore.FlyMode and hrp then
+        if UIS:IsKeyDown(Enum.KeyCode.Space) then
+            hrp.AssemblyLinearVelocity = Vector3.new(hrp.AssemblyLinearVelocity.X, FlySpeed, hrp.AssemblyLinearVelocity.Z)
+        else
+            -- Boş bırakılırsa düşmeye izin ver (doğal fizik)
+            if math.abs(hrp.AssemblyLinearVelocity.Y - FlySpeed) < 0.1 then
+                hrp.AssemblyLinearVelocity = Vector3.new(hrp.AssemblyLinearVelocity.X, 0, hrp.AssemblyLinearVelocity.Z)
+            end
+        end
     end
 
-    -- Sağ Tık Soft Aimbot
+    -- Soft Aimbot (Sağ tık basılıyken)
     if _G.TWDCore.Aimbot and UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
         local target = GetClosestTarget()
         if target then
@@ -232,7 +239,7 @@ RS.RenderStepped:Connect(function()
 end)
 
 -- ==========================================
--- 🔄 6. ARKA PLAN ESP DÖNGÜSÜ (0.5 Saniye)
+-- 🔄 6. ARKA PLAN ESP DÖNGÜSÜ
 -- ==========================================
 task.spawn(function()
     while _G.TWDCoreRun do
@@ -270,7 +277,8 @@ task.spawn(function()
 
         if _G.TWDCore.LootESP then
             for _, obj in pairs(Workspace:GetChildren()) do
-                if (obj:IsA("Tool") or obj.Name:lower():find("loot") or obj.Name:lower():find("item")) and not obj:FindFirstChild("TWD_ESP_OBJ") then
+                local nameLower = obj.Name:lower()
+                if (obj:IsA("Tool") or nameLower:find("loot") or nameLower:find("item")) and not obj:FindFirstChild("TWD_ESP_OBJ") then
                     local h = Instance.new("Highlight")
                     h.Name = "TWD_ESP_OBJ"
                     h:SetAttribute("ESPType", "Loot")
@@ -291,4 +299,4 @@ UIS.InputBegan:Connect(function(input, gpe)
     end
 end)
 
-print("⚡ TWD ULTIMATE SCRIPT YARINA HAZIR!")
+print("⚡ TWD ULTIMATE SCRIPT DÜZELTİLDİ VE ÇALIŞMAYA HAZIR!")
