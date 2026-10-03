@@ -1,6 +1,7 @@
--- [[ THE WALKING DEAD - RIGHT CLICK AIMBOT & FAST SPEED ]] --
--- [[ Aimbot: SAĞ TIK BASILI TUTUNCA ]] --
+-- [[ THE WALKING DEAD - FLY, FAST & LAG-FREE AIMBOT ]] --
 -- [[ Menü Aç/Kapa: INSERT ]] --
+-- [[ Havaya Uçma: SPACE TUŞUNA BASILI TUTUNCA ]] --
+-- [[ Aimbot: SAĞ TIK BASILI TUTUNCA ]] --
 
 local Players = game:GetService("Players")
 local CoreGui = game:GetService("CoreGui")
@@ -12,7 +13,7 @@ local LP = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
 -- ==========================================
--- 🧹 1. TEMİZLİK
+-- 🧹 1. AGRESİF ESKİ MENÜ VE KALINTI TEMİZLİĞİ
 -- ==========================================
 _G.TWDCoreRun = false
 
@@ -22,7 +23,7 @@ if _G.TWDCore then
     _G.TWDCore.ZombieESP   = false
     _G.TWDCore.PlayerESP   = false
     _G.TWDCore.LootESP     = false
-    _G.TWDCore.HighJump    = false
+    _G.TWDCore.FlyMode     = false
     _G.TWDCore.NoFog       = false
     _G.TWDCore.Aimbot      = false
 end
@@ -52,14 +53,14 @@ _G.TWDCore = {
     ZombieESP   = false,
     PlayerESP   = false,
     LootESP     = false,
-    HighJump    = false,
+    FlyMode     = false,
     NoFog       = false,
     Aimbot      = false
 }
 
-local Smoothness = 0.22 -- Aimbot takip hızı (Artırıldı)
-local TargetFOV = 300 -- Aimbot tarama alanı
-local SpeedValue = 80 -- Yeni Yüksek Hız Değeri
+local Smoothness = 0.12 -- Kasmayı önleyen akıcı nişan hızı
+local TargetFOV = 220
+local FlySpeed = 45
 
 -- GUI
 local ScreenGui = Instance.new("ScreenGui")
@@ -81,7 +82,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(25, 20, 20)
 Title.BorderSizePixel = 0
-Title.Text = "⚡ TWD HELPER (FAST & RIGHT-CLICK) ⚡"
+Title.Text = "⚡ TWD HELPER (FLY & SMOOTH) ⚡"
 Title.TextColor3 = Color3.fromRGB(255, 60, 60)
 Title.Font = Enum.Font.Code
 Title.TextSize = 11
@@ -127,17 +128,13 @@ end
 -- ==========================================
 CreateButton("Aimbot", "SOFT AIMBOT (SAĞ TIK)", function(v) end)
 
-CreateButton("SprintSpeed", "YÜKSEK HIZ (80 HIZ)", function(v)
+CreateButton("SprintSpeed", "YÜKSEK HIZ (BOOST)", function(v)
     if not v and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         LP.Character.Humanoid.WalkSpeed = 16
     end
 end)
 
-CreateButton("HighJump", "YÜKSEK ZIPLAMA", function(v)
-    if not v and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid.JumpPower = 50
-    end
-end)
+CreateButton("FlyMode", "UÇMA (SPACE BASILI TUT)", function(v) end)
 
 CreateButton("ZombieESP", "ZOMBİ ESP (KIRMIZI)", function(v)
     if not v then
@@ -184,14 +181,15 @@ CreateButton("NoFog", "SİS KALDIR", function(v)
 end)
 
 -- ==========================================
--- 🎯 4. AIMBOT HEDEF TARAMA
+-- 🎯 4. HAFİF AIMBOT TARAMASI (KASMAMASI İÇİN)
 -- ==========================================
 local function GetClosestTarget()
     local closest = nil
     local shortest = TargetFOV
     local mousePos = UIS:GetMouseLocation()
 
-    for _, obj in pairs(Workspace:GetDescendants()) do
+    -- Sadece Workspace üst seviye objelerini tara (Derin aramayı kestiğimiz için kasma biter)
+    for _, obj in pairs(Workspace:GetChildren()) do
         if obj:IsA("Model") and obj:FindFirstChild("Head") and not Players:GetPlayerFromCharacter(obj) then
             local hum = obj:FindFirstChildOfClass("Humanoid")
             if hum and hum.Health > 0 then
@@ -210,24 +208,29 @@ local function GetClosestTarget()
 end
 
 -- ==========================================
--- 🔄 5. DÖNGÜLER
+-- 🔄 5. ANLIK DÖNGÜLER
 -- ==========================================
 
--- A) Hareket ve Aimbot (Her karede)
 RS.RenderStepped:Connect(function()
-    -- Hız
-    if _G.TWDCore.SprintSpeed and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid.WalkSpeed = SpeedValue
+    local char = LP.Character
+    if not char then return end
+    local hum = char:FindFirstChildOfClass("Humanoid")
+    local hrp = char:FindFirstChild("HumanoidRootPart")
+
+    -- 1) Güçlendirilmiş Hız (Oyun İçi Sınırlamaları Aşmak İçin CFrame Destekli)
+    if _G.TWDCore.SprintSpeed and hum and hrp then
+        hum.WalkSpeed = 70
+        if hum.MoveDirection.Magnitude > 0 then
+            hrp.CFrame = hrp.CFrame + (hum.MoveDirection * 0.8)
+        end
     end
 
-    -- Zıplama
-    if _G.TWDCore.HighJump and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        local hum = LP.Character.Humanoid
-        hum.UseJumpPower = true
-        hum.JumpPower = 100
+    -- 2) Space Tuşuna Basılı Tuttukça Uçma (Fly)
+    if _G.TWDCore.FlyMode and hrp and UIS:IsKeyDown(Enum.KeyCode.Space) then
+        hrp.Velocity = Vector3.new(hrp.Velocity.X, FlySpeed, hrp.Velocity.Z)
     end
 
-    -- Sağ Tık Aimbot
+    -- 3) Sağ Tık Hafif Aimbot
     if _G.TWDCore.Aimbot and UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
         local target = GetClosestTarget()
         if target then
@@ -236,7 +239,9 @@ RS.RenderStepped:Connect(function()
     end
 end)
 
--- B) Arka Plan ESP Taraması (0.5s)
+-- ==========================================
+-- 🔄 6. ARKA PLAN ESP DÖNGÜSÜ (0.5s)
+-- ==========================================
 task.spawn(function()
     while _G.TWDCoreRun do
         task.wait(0.5)
@@ -294,4 +299,4 @@ UIS.InputBegan:Connect(function(input, gpe)
     end
 end)
 
-print("⚡ SAĞ TIK AIMBOT VE YÜKSEK HIZ YÜKLENDİ!")
+print("⚡ ULTIMATE UÇMA & SMOOTH AIMBOT YÜKLENDİ!")
