@@ -1,4 +1,4 @@
--- [[ THE WALKING DEAD - NO-RUBBERBAND FAST SPEED & FLY ]] --
+-- [[ THE WALKING DEAD - ZERO-LAG & SMOOTH C-FRAME SPEED ]] --
 -- [[ Menü Aç/Kapa: INSERT ]] --
 
 local Players = game:GetService("Players")
@@ -11,7 +11,7 @@ local LP = Players.LocalPlayer
 local Camera = Workspace.CurrentCamera
 
 -- ==========================================
--- 🧹 1. ESKİ MENÜ VE KALINTI TEMİZLİĞİ
+-- 🧹 1. TEMİZLİK
 -- ==========================================
 _G.TWDCoreRun = false
 
@@ -56,10 +56,10 @@ _G.TWDCore = {
     Aimbot      = false
 }
 
-local Smoothness = 0.15
+local Smoothness = 0.12
 local TargetFOV = 200
-local CustomWalkSpeed = 50 -- Takılma yapmayan stabil yüksek hız
-local FlySpeed = 50
+local StepMultiplier = 0.45 -- Takılmasız yağ gibi kayma adımı
+local FlyPower = 1.2
 
 -- GUI
 local ScreenGui = Instance.new("ScreenGui")
@@ -81,7 +81,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(25, 20, 20)
 Title.BorderSizePixel = 0
-Title.Text = "⚡ TWD HELPER (SMOOTH MOVE) ⚡"
+Title.Text = "⚡ TWD HELPER (SMOOTH CFRAME) ⚡"
 Title.TextColor3 = Color3.fromRGB(255, 60, 60)
 Title.Font = Enum.Font.Code
 Title.TextSize = 11
@@ -123,16 +123,10 @@ local function CreateButton(id, text, callback)
 end
 
 -- ==========================================
--- 🛠️ 3. BUTONLAR
+-- 🛠️️ 3. BUTONLAR
 -- ==========================================
 CreateButton("Aimbot", "SOFT AIMBOT (SAĞ TIK)", function(v) end)
-
-CreateButton("SprintSpeed", "AKICI YÜKSEK HIZ", function(v)
-    if not v and LP.Character and LP.Character:FindFirstChildOfClass("Humanoid") then
-        LP.Character:FindFirstChildOfClass("Humanoid").WalkSpeed = 16
-    end
-end)
-
+CreateButton("SprintSpeed", "TAKILMASIZ YÜKSEK HIZ", function(v) end)
 CreateButton("FlyMode", "UÇMA (SPACE BASILI TUT)", function(v) end)
 
 CreateButton("ZombieESP", "ZOMBİ ESP (KIRMIZI)", function(v)
@@ -180,7 +174,7 @@ CreateButton("NoFog", "SİS KALDIR", function(v)
 end)
 
 -- ==========================================
--- 🎯 4. AIMBOT TARGETING
+-- 🎯 4. AIMBOT TARAMA (SADECE YAKIN MOUSE)
 -- ==========================================
 local function GetClosestTarget()
     local closest = nil
@@ -206,38 +200,28 @@ local function GetClosestTarget()
 end
 
 -- ==========================================
--- 🔄 5. FİZİK VE HAREKET DÖNGÜSÜ
+-- 🔄 5. KASMASIZ & TAKILMASIZ RENDER DÖNGÜSÜ
 -- ==========================================
 
-RS.Heartbeat:Connect(function()
+RS.RenderStepped:Connect(function()
     local char = LP.Character
     if not char then return end
     local hum = char:FindFirstChildOfClass("Humanoid")
     local hrp = char:FindFirstChild("HumanoidRootPart")
 
-    -- Akıcı ve Takılmasız Hız (Physics Velocity Tabanlı)
+    -- A) Micro-Step CFrame Hızlandırma (Anti-Cheat'e Takılmaz)
     if _G.TWDCore.SprintSpeed and hum and hrp then
-        hum.WalkSpeed = CustomWalkSpeed
         if hum.MoveDirection.Magnitude > 0 then
-            local moveDir = hum.MoveDirection
-            hrp.AssemblyLinearVelocity = Vector3.new(
-                moveDir.X * CustomWalkSpeed,
-                hrp.AssemblyLinearVelocity.Y,
-                moveDir.Z * CustomWalkSpeed
-            )
+            hrp.CFrame = hrp.CFrame + (hum.MoveDirection * StepMultiplier)
         end
     end
 
-    -- Uçma (Space)
+    -- B) Uçma (Space)
     if _G.TWDCore.FlyMode and hrp and UIS:IsKeyDown(Enum.KeyCode.Space) then
-        hrp.AssemblyLinearVelocity = Vector3.new(
-            hrp.AssemblyLinearVelocity.X,
-            FlySpeed,
-            hrp.AssemblyLinearVelocity.Z
-        )
+        hrp.CFrame = hrp.CFrame + Vector3.new(0, FlyPower, 0)
     end
 
-    -- Sağ Tık Soft Aimbot
+    -- C) Sağ Tık Aimbot
     if _G.TWDCore.Aimbot and UIS:IsMouseButtonPressed(Enum.UserInputType.MouseButton2) then
         local target = GetClosestTarget()
         if target then
@@ -247,7 +231,7 @@ RS.Heartbeat:Connect(function()
 end)
 
 -- ==========================================
--- 🔄 6. ARKA PLAN ESP DÖNGÜSÜ (0.5s)
+-- 🔄 6. ARKA PLAN ESP (0.5s)
 -- ==========================================
 task.spawn(function()
     while _G.TWDCoreRun do
@@ -306,4 +290,4 @@ UIS.InputBegan:Connect(function(input, gpe)
     end
 end)
 
-print("⚡ DÜZELTİLMİŞ AKICI SCRIPT YÜKLENDİ!")
+print("⚡ SMOOTH C-FRAME SCRIPT YÜKLENDİ!")
