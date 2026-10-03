@@ -1,4 +1,4 @@
--- [[ THE WALKING DEAD - LOW STEP / NO-RUBBERBAND HELPER ]] --
+-- [[ THE WALKING DEAD - FIXED FLY & LOW STEP HELPER ]] --
 -- [[ Menü Aç/Kapa: INSERT ]] --
 
 local Players = game:GetService("Players")
@@ -43,7 +43,7 @@ task.wait(0.1)
 _G.TWDCoreRun = true
 
 -- ==========================================
--- ⚙️️ 2. AYARLAR
+-- ⚙️ 2. AYARLAR
 -- ==========================================
 _G.TWDCore = {
     SprintSpeed = false,
@@ -58,8 +58,8 @@ _G.TWDCore = {
 
 local Smoothness = 0.12
 local TargetFOV = 200
-local StepMultiplier = 0.18 -- Takılmayı önlemek için düşürülen stabil adım hızı
-local FlyPower = 0.8
+local StepMultiplier = 0.12 -- Takılmayı tamamen sıfırlamak için optimize edilmiş hız
+local FlyPower = 0.5 -- Akıcı ve dengeli yükselme hızı
 
 -- GUI
 local ScreenGui = Instance.new("ScreenGui")
@@ -81,7 +81,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(25, 20, 20)
 Title.BorderSizePixel = 0
-Title.Text = "⚡ TWD HELPER (DÜŞÜK HIZ) ⚡"
+Title.Text = "⚡ TWD HELPER (FIXED FLY & SPEED) ⚡"
 Title.TextColor3 = Color3.fromRGB(255, 60, 60)
 Title.Font = Enum.Font.Code
 Title.TextSize = 11
@@ -126,7 +126,7 @@ end
 -- 🛠️ 3. BUTONLAR
 -- ==========================================
 CreateButton("Aimbot", "SOFT AIMBOT (SAĞ TIK)", function(v) end)
-CreateButton("SprintSpeed", "DÜŞÜK HIZ (TAKILMASIZ)", function(v) end)
+CreateButton("SprintSpeed", "STABİL HIZ (TAKILMASIZ)", function(v) end)
 CreateButton("FlyMode", "UÇMA (SPACE BASILI TUT)", function(v) end)
 
 CreateButton("ZombieESP", "ZOMBİ ESP (KIRMIZI)", function(v)
@@ -200,7 +200,7 @@ local function GetClosestTarget()
 end
 
 -- ==========================================
--- 🔄 5. DÖNGÜLER
+-- 🔄 5. ANLIK DÖNGÜ
 -- ==========================================
 
 RS.RenderStepped:Connect(function()
@@ -216,9 +216,9 @@ RS.RenderStepped:Connect(function()
         end
     end
 
-    -- Uçma
+    -- Düzeltilmiş Uçma Mantığı (Space Basılı Tutunca Yükselme)
     if _G.TWDCore.FlyMode and hrp and UIS:IsKeyDown(Enum.KeyCode.Space) then
-        hrp.CFrame = hrp.CFrame + Vector3.new(0, FlyPower, 0)
+        hrp.CFrame = hrp.CFrame * CFrame.new(0, FlyPower, 0)
     end
 
     -- Sağ Tık Aimbot
@@ -287,4 +287,4 @@ UIS.InputBegan:Connect(function(input, gpe)
     end
 end)
 
-print("⚡ LOW SPEED FIXED SCRIPT YÜKLENDİ!")
+print("⚡ FLY & LOW SPEED FIX YÜKLENDİ!")
