@@ -1,4 +1,4 @@
--- [[ THE WALKING DEAD - LAG-FREE & FULL CLEANUP HELPER ]] --
+-- [[ THE WALKING DEAD - HIGH SPEED (60 HIZ) & LAG-FREE HELPER ]] --
 -- [[ Menü Aç/Kapa: INSERT ]] --
 
 local Players = game:GetService("Players")
@@ -13,7 +13,7 @@ local Camera = Workspace.CurrentCamera
 -- ==========================================
 -- 🧹 1. AGRESİF ESKİ MENÜ VE KALINTI TEMİZLİĞİ
 -- ==========================================
-_G.TWDCoreRun = false -- Eski çalışan task döngülerini durdurur
+_G.TWDCoreRun = false
 
 if _G.TWDCore then
     _G.TWDCore.SprintSpeed = false
@@ -26,14 +26,12 @@ if _G.TWDCore then
     _G.TWDCore.Aimbot      = false
 end
 
--- Eski ESP nesnelerini temizle
 for _, obj in pairs(Workspace:GetDescendants()) do
     if obj.Name == "TWD_ESP_OBJ" or obj.Name == "TWDESP" or obj.Name == "TWDLootESP" or obj.Name == "TWDZombieESP" or obj.Name == "TWDPlayerESP" then
         obj:Destroy()
     end
 end
 
--- Eski GUI ve Nişan noktalarını temizle
 for _, menuName in pairs({"TWDCoreMenu", "FutbolCoreMenu", "TWDCrosshair"}) do
     local oldMenu = CoreGui:FindFirstChild(menuName)
     if oldMenu then
@@ -42,7 +40,7 @@ for _, menuName in pairs({"TWDCoreMenu", "FutbolCoreMenu", "TWDCrosshair"}) do
 end
 
 task.wait(0.1)
-_G.TWDCoreRun = true -- Yeni döngüyü başlat
+_G.TWDCoreRun = true
 
 -- ==========================================
 -- ⚙️ 2. AYARLAR VE ÖNBELLEK
@@ -81,7 +79,7 @@ local Title = Instance.new("TextLabel")
 Title.Size = UDim2.new(1, 0, 0, 35)
 Title.BackgroundColor3 = Color3.fromRGB(25, 20, 20)
 Title.BorderSizePixel = 0
-Title.Text = "⚡ TWD HELPER (CLEAN & FAST) ⚡"
+Title.Text = "⚡ TWD HELPER (60 HIZ) ⚡"
 Title.TextColor3 = Color3.fromRGB(255, 60, 60)
 Title.Font = Enum.Font.Code
 Title.TextSize = 12
@@ -127,7 +125,7 @@ end
 -- ==========================================
 CreateButton("Aimbot", "SOFT AIMBOT (SOL TIK)", function(v) end)
 
-CreateButton("SprintSpeed", "HIZLI KOŞMA (30 HIZ)", function(v)
+CreateButton("SprintSpeed", "HIZLI KOŞMA (60 HIZ)", function(v)
     if not v and LP.Character and LP.Character:FindFirstChild("Humanoid") then
         LP.Character.Humanoid.WalkSpeed = 16
     end
@@ -216,7 +214,7 @@ end
 -- A) Sadece fizik ve hareketler (Her kare)
 RS.Heartbeat:Connect(function()
     if _G.TWDCore.SprintSpeed and LP.Character and LP.Character:FindFirstChild("Humanoid") then
-        LP.Character.Humanoid.WalkSpeed = 30
+        LP.Character.Humanoid.WalkSpeed = 60
     end
 
     if _G.TWDCore.HighJump and LP.Character and LP.Character:FindFirstChild("Humanoid") then
@@ -294,4 +292,4 @@ UIS.InputBegan:Connect(function(input, gpe)
     end
 end)
 
-print("⚡ ESKİ MENÜLER TEMİZLENDİ & YENİ SCRIPT YÜKLENDİ!")
+print("⚡ 60 HIZ SCRIPT YÜKLENDİ!")
